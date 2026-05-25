@@ -6,14 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
-  "build": "tsc",
-  "start": "node dist/index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "studio": "prisma studio --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -31,5 +33,8 @@
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
-  }
+  },
+  "prisma": {
+  "seed": "ts-node prisma/seed.ts"
+}
 }

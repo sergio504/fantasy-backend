@@ -4,10 +4,144 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql",
+  url      = env("DATABASE_URL")
+
+}
+
+// ─── USUARIO ───────────────────────────────────────
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  team      Team?
+  leagues   LeagueMember[]
+}
+
+// ─── LIGA ──────────────────────────────────────────
+model League {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique  // código para invitar amigos
+  adminId   String
+  maxTeams  Int      @default(10)
+  budget    Int      @default(100)  // millones iniciales
+  createdAt DateTime @default(now())
+
+  members   LeagueMember[]
+  matchdays Matchday[]
+}
+
+// ─── MIEMBROS DE LA LIGA ───────────────────────────
+model LeagueMember {
+  id       String @id @default(uuid())
+  userId   String
+  leagueId String
+
+  user     User   @relation(fields: [userId], references: [id])
+  league   League @relation(fields: [leagueId], references: [id])
+
+  @@unique([userId, leagueId])
+}
+
+// ─── EQUIPO ────────────────────────────────────────
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String   @unique
+  budget    Int      @default(100)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  players   TeamPlayer[]
+  scores    Score[]
+}
+
+// ─── JUGADOR ───────────────────────────────────────
+model Player {
+  id        String   @id @default(uuid())
+  name      String
+  position  Position
+  clubTeam  String   // equipo real (ej: "Real Madrid")
+  price     Int      // precio en millones
+  active    Boolean  @default(true)
+
+  teams     TeamPlayer[]
+  stats     PlayerStat[]
+}
+
+enum Position {
+  GOALKEEPER
+  DEFENDER
+  MIDFIELDER
+  FORWARD
+}
+
+// ─── JUGADORES DE CADA EQUIPO ──────────────────────
+model TeamPlayer {
+  id       String @id @default(uuid())
+  teamId   String
+  playerId String
+  isCaptain Boolean @default(false)
+
+  team     Team   @relation(fields: [teamId], references: [id])
+  player   Player @relation(fields: [playerId], references: [id])
+
+  @@unique([teamId, playerId])
+}
+
+// ─── JORNADA ───────────────────────────────────────
+model Matchday {
+  id        String        @id @default(uuid())
+  leagueId  String
+  number    Int
+  deadline  DateTime
+  status    MatchdayStatus @default(PENDING)
+
+  league    League        @relation(fields: [leagueId], references: [id])
+  stats     PlayerStat[]
+  scores    Score[]
+}
+
+enum MatchdayStatus {
+  PENDING    // aún no ha empezado
+  ACTIVE     // en curso
+  CLOSED     // terminada, puntuaciones calculadas
+}
+
+// ─── ESTADÍSTICAS DE JUGADOR POR JORNADA ───────────
+model PlayerStat {
+  id          String   @id @default(uuid())
+  playerId    String
+  matchdayId  String
+  goals       Int      @default(0)
+  assists     Int      @default(0)
+  yellowCards Int      @default(0)
+  redCards    Int      @default(0)
+  minutesPlayed Int    @default(0)
+  points      Int      @default(0)  // puntos fantasy calculados
+
+  player      Player   @relation(fields: [playerId], references: [id])
+  matchday    Matchday @relation(fields: [matchdayId], references: [id])
+
+  @@unique([playerId, matchdayId])
+}
+
+// ─── PUNTUACIÓN DE EQUIPO POR JORNADA ──────────────
+model Score {
+  id         String   @id @default(uuid())
+  teamId     String
+  matchdayId String
+  points     Int      @default(0)
+
+  team       Team     @relation(fields: [teamId], references: [id])
+  matchday   Matchday @relation(fields: [matchdayId], references: [id])
+
+  @@unique([teamId, matchdayId])
 }

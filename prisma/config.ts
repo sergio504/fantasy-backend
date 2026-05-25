@@ -7,6 +7,9 @@ export default defineConfig({
   migrations: {
     seed: 'ts-node ./prisma/seed.ts',
   },
+  datasource: {
+    url: 'postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol',
+  },
   migrate: {
     async adapter() {
       const { PrismaPg } = await import('@prisma/adapter-pg')
