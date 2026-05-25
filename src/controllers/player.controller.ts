@@ -19,7 +19,7 @@ export const getPlayers = async (req: Request, res: Response) => {
 export const getPlayerById = async (req: Request, res: Response) => {
   try {
     const player = await prisma.player.findUnique({
-      where: { id: req.params.id }
+      where: { id: req.params.id as string }
     })
 
     if (!player) {
