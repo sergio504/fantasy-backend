@@ -2,6 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.routes'
+import ligaRoutes from './routes/league.routes'
+import jugadorRoutes from './routes/player.routes'
+import mercadoRoutes from './routes/market.routes'
 
 dotenv.config()
 
@@ -13,7 +16,9 @@ app.use(express.json())
 
 // Rutas
 app.use('/api/auth', authRoutes)
-app.use('/api/players', playerRoutes)
+app.use('/api/ligas', ligaRoutes)
+app.use('/api/ligas/:ligaId/mercado', mercadoRoutes)
+app.use('/api/jugadores', jugadorRoutes)
 
 
 // Health check

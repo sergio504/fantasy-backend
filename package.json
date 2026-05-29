@@ -8,6 +8,8 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "db:push": "prisma db push --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\"",
+
     "studio": "prisma studio --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\""
   },
   "keywords": [],

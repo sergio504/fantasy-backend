@@ -1,33 +1,33 @@
 import { Request, Response } from 'express'
 import { prisma } from '../prismaClient'
 
-export const getPlayers = async (req: Request, res: Response) => {
+export const getJugadores = async (req: Request, res: Response) => {
   try {
-    const { position } = req.query
+    const { posicion } = req.query
 
-    const players = await prisma.player.findMany({
-      where: position ? { position: position as any } : undefined,
-      orderBy: { price: 'desc' }
+    const jugadores = await prisma.jugador.findMany({
+      where: posicion ? { posicion: posicion as any } : undefined,
+      orderBy: { valor: 'desc' }
     })
 
-    res.json(players)
+    res.json(jugadores)
   } catch {
     res.status(500).json({ error: 'Error al obtener jugadores' })
   }
 }
 
-export const getPlayerById = async (req: Request, res: Response) => {
+export const getJugadorPorId = async (req: Request, res: Response) => {
   try {
-    const player = await prisma.player.findUnique({
+    const jugador = await prisma.jugador.findUnique({
       where: { id: req.params.id as string }
     })
 
-    if (!player) {
+    if (!jugador) {
       res.status(404).json({ error: 'Jugador no encontrado' })
       return
     }
 
-    res.json(player)
+    res.json(jugador)
   } catch {
     res.status(500).json({ error: 'Error al obtener jugador' })
   }

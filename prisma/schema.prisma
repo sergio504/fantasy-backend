@@ -1,147 +1,188 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql",
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+}
 
+// ─── ENUMS ─────────────────────────────────────────
+
+enum Division {
+  A
+  B
+  C
+}
+
+enum Posicion {
+  PORTERO
+  DEFENSA
+  CENTROCAMPISTA
+  DELANTERO
+}
+
+enum EstadoOferta {
+  ACTIVA
+  VENDIDA
+  CANCELADA
 }
 
 // ─── USUARIO ───────────────────────────────────────
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  team      Team?
-  leagues   LeagueMember[]
+
+model Usuario {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  username   String   @unique
+  contrasena String
+  creadoEn   DateTime @default(now())
+
+  ligasCreadas Liga[]       @relation("CreadorLiga")
+  membresias MiembroLiga[]
 }
 
 // ─── LIGA ──────────────────────────────────────────
-model League {
-  id        String   @id @default(uuid())
-  name      String
-  code      String   @unique  // código para invitar amigos
-  adminId   String
-  maxTeams  Int      @default(10)
-  budget    Int      @default(100)  // millones iniciales
-  createdAt DateTime @default(now())
 
-  members   LeagueMember[]
-  matchdays Matchday[]
+model Liga {
+  id                 String   @id @default(uuid())
+  nombre             String
+  creadorId          String
+  division           Division
+  publica            Boolean  @default(true)
+  codigoInvitacion   String?  @unique
+  maxEquipos         Int      @default(10)
+  presupuestoInicial Int      @default(100)
+  creadoEn           DateTime @default(now())
+
+  creador         Usuario         @relation("CreadorLiga", fields: [creadorId], references: [id])
+  miembros        MiembroLiga[]
+  jugadoresEquipo JugadorEquipo[]
+  ofertas         OfertaMercado[]
+  transferencias  Transferencia[]
 }
 
-// ─── MIEMBROS DE LA LIGA ───────────────────────────
-model LeagueMember {
-  id       String @id @default(uuid())
-  userId   String
-  leagueId String
+// ─── MIEMBRO LIGA (equipo dentro de una liga) ──────
 
-  user     User   @relation(fields: [userId], references: [id])
-  league   League @relation(fields: [leagueId], references: [id])
+model MiembroLiga {
+  id                  String   @id @default(uuid())
+  ligaId              String
+  usuarioId           String
+  presupuestoRestante Int      @default(100)
+  puntuacion          Int      @default(0)
+  formacion           String?
+  capitanId           String?
+  creadoEn            DateTime @default(now())
 
-  @@unique([userId, leagueId])
-}
+  liga         Liga            @relation(fields: [ligaId], references: [id])
+  usuario      Usuario         @relation(fields: [usuarioId], references: [id])
+  capitan      Jugador?        @relation("CapitanLiga", fields: [capitanId], references: [id])
+  jugadores    JugadorEquipo[]
+  titulares    TitularLiga[]
+  pujas        Puja[]
+  ofertasVenta OfertaMercado[] @relation("OfertaVendedor")
+  compras      Transferencia[] @relation("TransferenciaComprador")
+  ventas       Transferencia[] @relation("TransferenciaVendedor")
 
-// ─── EQUIPO ────────────────────────────────────────
-model Team {
-  id        String   @id @default(uuid())
-  name      String
-  userId    String   @unique
-  budget    Int      @default(100)
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  players   TeamPlayer[]
-  scores    Score[]
+  @@unique([ligaId, usuarioId])
 }
 
 // ─── JUGADOR ───────────────────────────────────────
-model Player {
-  id        String   @id @default(uuid())
-  name      String
-  position  Position
-  clubTeam  String   // equipo real (ej: "Real Madrid")
-  price     Int      // precio en millones
-  active    Boolean  @default(true)
 
-  teams     TeamPlayer[]
-  stats     PlayerStat[]
-}
-
-enum Position {
-  GOALKEEPER
-  DEFENDER
-  MIDFIELDER
-  FORWARD
-}
-
-// ─── JUGADORES DE CADA EQUIPO ──────────────────────
-model TeamPlayer {
-  id       String @id @default(uuid())
-  teamId   String
-  playerId String
-  isCaptain Boolean @default(false)
-
-  team     Team   @relation(fields: [teamId], references: [id])
-  player   Player @relation(fields: [playerId], references: [id])
-
-  @@unique([teamId, playerId])
-}
-
-// ─── JORNADA ───────────────────────────────────────
-model Matchday {
-  id        String        @id @default(uuid())
-  leagueId  String
-  number    Int
-  deadline  DateTime
-  status    MatchdayStatus @default(PENDING)
-
-  league    League        @relation(fields: [leagueId], references: [id])
-  stats     PlayerStat[]
-  scores    Score[]
-}
-
-enum MatchdayStatus {
-  PENDING    // aún no ha empezado
-  ACTIVE     // en curso
-  CLOSED     // terminada, puntuaciones calculadas
-}
-
-// ─── ESTADÍSTICAS DE JUGADOR POR JORNADA ───────────
-model PlayerStat {
-  id          String   @id @default(uuid())
-  playerId    String
-  matchdayId  String
-  goals       Int      @default(0)
-  assists     Int      @default(0)
-  yellowCards Int      @default(0)
-  redCards    Int      @default(0)
-  minutesPlayed Int    @default(0)
-  points      Int      @default(0)  // puntos fantasy calculados
-
-  player      Player   @relation(fields: [playerId], references: [id])
-  matchday    Matchday @relation(fields: [matchdayId], references: [id])
-
-  @@unique([playerId, matchdayId])
-}
-
-// ─── PUNTUACIÓN DE EQUIPO POR JORNADA ──────────────
-model Score {
+model Jugador {
   id         String   @id @default(uuid())
-  teamId     String
-  matchdayId String
-  points     Int      @default(0)
+  nombre     String
+  posicion   Posicion
+  division   Division
+  equipoReal String
+  valor      Int
+  creadoEn   DateTime @default(now())
 
-  team       Team     @relation(fields: [teamId], references: [id])
-  matchday   Matchday @relation(fields: [matchdayId], references: [id])
+  equipos        JugadorEquipo[]
+  ofertas        OfertaMercado[]
+  transferencias Transferencia[]
+  titularEn      TitularLiga[]
+  capitanDe      MiembroLiga[]   @relation("CapitanLiga")
+}
 
-  @@unique([teamId, matchdayId])
+
+// ─── TITULAR LIGA (11 inicial de cada equipo) ──────
+
+model TitularLiga {
+  id            String @id @default(uuid())
+  miembroLigaId String
+  jugadorId     String
+
+  miembroLiga MiembroLiga @relation(fields: [miembroLigaId], references: [id])
+  jugador     Jugador     @relation(fields: [jugadorId], references: [id])
+
+  @@unique([miembroLigaId, jugadorId])
+}
+
+// ─── JUGADOR EQUIPO (plantilla actual) ─────────────
+
+model JugadorEquipo {
+  id            String   @id @default(uuid())
+  ligaId        String
+  miembroLigaId String
+  jugadorId     String
+  precioCompra  Int
+  creadoEn      DateTime @default(now())
+
+  liga        Liga        @relation(fields: [ligaId], references: [id])
+  miembroLiga MiembroLiga @relation(fields: [miembroLigaId], references: [id])
+  jugador     Jugador     @relation(fields: [jugadorId], references: [id])
+
+  @@unique([ligaId, jugadorId])
+}
+
+// ─── OFERTA MERCADO ────────────────────────────────
+
+model OfertaMercado {
+  id              String       @id @default(uuid())
+  ligaId          String
+  jugadorId       String
+  vendedorId      String?
+  precioMinimo    Int
+  estado          EstadoOferta @default(ACTIVA)
+  fechaCaducidad  DateTime?
+  creadoEn        DateTime     @default(now())
+
+  liga          Liga           @relation(fields: [ligaId], references: [id])
+  jugador       Jugador        @relation(fields: [jugadorId], references: [id])
+  vendedor      MiembroLiga?   @relation("OfertaVendedor", fields: [vendedorId], references: [id])
+  pujas         Puja[]
+  transferencia Transferencia?
+}
+
+// ─── PUJA ──────────────────────────────────────────
+
+model Puja {
+  id              String   @id @default(uuid())
+  ofertaMercadoId String
+  miembroLigaId   String
+  cantidad        Int
+  creadoEn        DateTime @default(now())
+
+  oferta      OfertaMercado @relation(fields: [ofertaMercadoId], references: [id])
+  miembroLiga MiembroLiga   @relation(fields: [miembroLigaId], references: [id])
+
+  @@unique([ofertaMercadoId, miembroLigaId])
+}
+
+// ─── TRANSFERENCIA (historial) ─────────────────────
+
+model Transferencia {
+  id          String   @id @default(uuid())
+  jugadorId   String
+  ligaId      String
+  vendedorId  String?
+  compradorId String
+  ofertaId    String?  @unique
+  precio      Int
+  fecha       DateTime @default(now())
+
+  jugador   Jugador        @relation(fields: [jugadorId], references: [id])
+  liga      Liga           @relation(fields: [ligaId], references: [id])
+  vendedor  MiembroLiga?   @relation("TransferenciaVendedor", fields: [vendedorId], references: [id])
+  comprador MiembroLiga    @relation("TransferenciaComprador", fields: [compradorId], references: [id])
+  oferta    OfertaMercado? @relation(fields: [ofertaId], references: [id])
 }

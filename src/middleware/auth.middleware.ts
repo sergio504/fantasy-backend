@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
 export interface AuthRequest extends Request {
-  userId?: string
+  usuarioId?: string
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -14,8 +14,8 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-    req.userId = decoded.userId
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { usuarioId: string }
+    req.usuarioId = decoded.usuarioId
     next()
   } catch {
     res.status(401).json({ error: 'Token inválido' })
