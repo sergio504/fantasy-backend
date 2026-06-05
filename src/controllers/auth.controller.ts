@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response) => {
       data: { email, username, contrasena }
     })
     const token = jwt.sign({ usuarioId: usuario.id }, process.env.JWT_SECRET!, { expiresIn: '7d' })
-    res.status(201).json({ token, usuario: { id: usuario.id, email, username } })
+    res.status(201).json({ token, usuario: { id: usuario.id, email, username, esAdmin: false, activo: true } })
   } catch {
     res.status(400).json({ error: 'El usuario o email ya existe' })
   }
@@ -35,7 +35,12 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign({ usuarioId: usuario.id }, process.env.JWT_SECRET!, { expiresIn: '7d' })
-    res.json({ token, usuario: { id: usuario.id, email: usuario.email, username: usuario.username } })
+    if (!usuario.activo) {
+      res.status(403).json({ error: 'Tu cuenta está desactivada. Contacta con el administrador.' })
+      return
+    }
+
+    res.json({ token, usuario: { id: usuario.id, email: usuario.email, username: usuario.username, esAdmin: usuario.esAdmin, activo: usuario.activo } })
   } catch {
     res.status(500).json({ error: 'Error del servidor' })
   }

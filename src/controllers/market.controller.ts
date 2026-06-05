@@ -1,6 +1,7 @@
 import { Response } from 'express'
 import { prisma } from '../prismaClient'
 import { AuthRequest } from '../middleware/auth.middleware'
+import { cerrarOfertaLogic } from '../lib/cerrarOfertaLogic'
 
 // ─── HELPER: verificar membresía ───────────────────
 
@@ -26,7 +27,11 @@ export const getOfertasLiga = async (req: AuthRequest, res: Response) => {
     const ofertas = await prisma.ofertaMercado.findMany({
       where: { ligaId, estado: 'ACTIVA' },
       include: {
-        jugador: true,
+        jugador: {
+          include: {
+            historialEquipos: { where: { activo: true }, include: { equipo: true }, take: 1 },
+          },
+        },
         vendedor: { include: { usuario: { select: { username: true } } } },
         _count: { select: { pujas: true } },
         // Solo la puja del propio usuario (sin importe de otros)
@@ -82,10 +87,9 @@ export const crearOferta = async (req: AuthRequest, res: Response) => {
       return
     }
 
-    const jugadorEnEquipo = await prisma.jugadorEquipo.findUnique({
+    const jugadorEnEquipo = await prisma.plantillaFantasy.findUnique({
       where: { ligaId_jugadorId: { ligaId, jugadorId } },
     })
-    // Verificar además que el jugador pertenece al miembro que hace la solicitud
     const esMio = jugadorEnEquipo?.miembroLigaId === miembro.id
     if (!jugadorEnEquipo || !esMio) {
       res.status(403).json({ error: 'No tienes este jugador en tu equipo' })
@@ -209,43 +213,12 @@ export const cerrarOferta = async (req: AuthRequest, res: Response) => {
       return
     }
 
-    const mejorPuja = oferta.pujas[0]
-    if (!mejorPuja) {
-      await prisma.ofertaMercado.update({ where: { id: ofertaId }, data: { estado: 'CANCELADA' } })
+    const resultado = await cerrarOfertaLogic(ofertaId)
+
+    if (resultado?.resultado === 'CANCELADA') {
       res.json({ mensaje: 'Oferta cancelada: ningún equipo realizó pujas' })
       return
     }
-
-    await prisma.$transaction(async tx => {
-      await tx.ofertaMercado.update({ where: { id: ofertaId }, data: { estado: 'VENDIDA' } })
-
-      await tx.jugadorEquipo.delete({
-        where: { ligaId_jugadorId: { ligaId, jugadorId: oferta.jugadorId } },
-      })
-      await tx.miembroLiga.update({
-        where: { id: oferta.vendedorId! },
-        data: { presupuestoRestante: { increment: mejorPuja.cantidad } },
-      })
-
-      await tx.jugadorEquipo.create({
-        data: { ligaId, miembroLigaId: mejorPuja.miembroLigaId, jugadorId: oferta.jugadorId, precioCompra: mejorPuja.cantidad },
-      })
-      await tx.miembroLiga.update({
-        where: { id: mejorPuja.miembroLigaId },
-        data: { presupuestoRestante: { decrement: mejorPuja.cantidad } },
-      })
-
-      await tx.transferencia.create({
-        data: {
-          jugadorId: oferta.jugadorId,
-          ligaId,
-          vendedorId: oferta.vendedorId,
-          compradorId: mejorPuja.miembroLigaId,
-          ofertaId,
-          precio: mejorPuja.cantidad,
-        },
-      })
-    })
 
     res.json({ mensaje: 'Oferta cerrada. Transferencia completada.' })
   } catch {
@@ -304,7 +277,11 @@ export const getTransferencias = async (req: AuthRequest, res: Response) => {
     const transferencias = await prisma.transferencia.findMany({
       where: { ligaId },
       include: {
-        jugador: { select: { nombre: true, posicion: true, equipoReal: true } },
+        jugador: {
+          include: {
+            historialEquipos: { where: { activo: true }, include: { equipo: true }, take: 1 },
+          },
+        },
         vendedor: { include: { usuario: { select: { username: true } } } },
         comprador: { include: { usuario: { select: { username: true } } } },
       },

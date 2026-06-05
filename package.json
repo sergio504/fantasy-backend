@@ -9,8 +9,10 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "db:push": "prisma db push --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\"",
-
-    "studio": "prisma studio --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\""
+    "studio": "prisma studio --url \"postgresql://fantasy_user:fantasy_pass@localhost:5432/fantasy_futbol\"",
+    "import:jugadores": "ts-node -P tsconfig.scripts.json prisma/importar-jugadores.ts",
+    "seed:config": "ts-node -P tsconfig.scripts.json prisma/seed-config-puntuacion.ts",
+    "seed:demo": "ts-node -P tsconfig.scripts.json prisma/seed-demo.ts"
   },
   "keywords": [],
   "author": "",
@@ -33,10 +35,11 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
     "nodemon": "^3.1.14",
+    "playwright": "^1.60.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
   "prisma": {
-  "seed": "ts-node prisma/seed.ts"
-}
+    "seed": "ts-node prisma/seed.ts"
+  }
 }

@@ -10,6 +10,8 @@ import {
   getJugadoresDisponibles,
   getAlineacion,
   guardarAlineacion,
+  getUltimaJornadaStats,
+  getHistorialAlineaciones,
 } from '../controllers/league.controller'
 import { getTransferencias } from '../controllers/market.controller'
 import { authMiddleware } from '../middleware/auth.middleware'
@@ -27,5 +29,7 @@ router.get('/:ligaId/mi-equipo', authMiddleware, getMiEquipo)
 router.get('/:ligaId/jugadores-disponibles', authMiddleware, getJugadoresDisponibles)
 router.get('/:ligaId/mi-alineacion', authMiddleware, getAlineacion)
 router.post('/:ligaId/mi-alineacion', authMiddleware, guardarAlineacion)
+router.get('/:ligaId/ultima-jornada-stats', authMiddleware, getUltimaJornadaStats)
+router.get('/:ligaId/historial-alineaciones', authMiddleware, getHistorialAlineaciones)
 
 export default router

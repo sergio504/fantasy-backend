@@ -5,6 +5,9 @@ import authRoutes from './routes/auth.routes'
 import ligaRoutes from './routes/league.routes'
 import jugadorRoutes from './routes/player.routes'
 import mercadoRoutes from './routes/market.routes'
+import adminRoutes from './routes/admin.routes'
+import jornadaRoutes from './routes/jornada.routes'
+import { ponerJugadoresEnMercado, resolverOfertasCaducadas } from './jobs/mercadoAutomatico'
 
 dotenv.config()
 
@@ -19,13 +22,59 @@ app.use('/api/auth', authRoutes)
 app.use('/api/ligas', ligaRoutes)
 app.use('/api/ligas/:ligaId/mercado', mercadoRoutes)
 app.use('/api/jugadores', jugadorRoutes)
-
+app.use('/api/admin', adminRoutes)
+app.use('/api/jornadas', jornadaRoutes)
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: '¡El servidor funciona!' })
 })
 
+// Calcula los ms hasta las 03:00 del día siguiente (hora local del servidor)
+function calcularMsHastaLas3(): number {
+  const ahora = new Date()
+  const proximas3 = new Date(ahora)
+  proximas3.setHours(3, 0, 0, 0)
+  if (proximas3 <= ahora) proximas3.setDate(proximas3.getDate() + 1)
+  return proximas3.getTime() - ahora.getTime()
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`)
+
+  // Mercado automático: se ejecuta cada 24h.
+  // El job comprueba internamente si han pasado 3 días para cada liga.
+  const ejecutarMercado = async () => {
+    console.log('[JOB] Ejecutando mercado automático...')
+    try {
+      const resumen = await ponerJugadoresEnMercado()
+      const total = resumen.reduce((s, r) => s + r.añadidos, 0)
+      console.log(`[JOB] Mercado completado: ${total} jugadores añadidos`)
+    } catch (e) {
+      console.error('[JOB] Error en mercado automático:', e)
+    }
+  }
+
+  const MS_24H = 24 * 60 * 60 * 1000
+  setTimeout(() => {
+    ejecutarMercado()
+    setInterval(ejecutarMercado, MS_24H)
+  }, calcularMsHastaLas3())
+
+  console.log(`[JOB] Mercado automático programado. Primera ejecución en ${Math.round(calcularMsHastaLas3() / 1000 / 60)} min`)
+
+  // Resolución de ofertas caducadas: cada hora
+  const ejecutarResolucion = async () => {
+    try {
+      const { resueltas, canceladas } = await resolverOfertasCaducadas()
+      if (resueltas + canceladas > 0) {
+        console.log(`[JOB] Ofertas caducadas: ${resueltas} vendidas, ${canceladas} canceladas`)
+      }
+    } catch (e) {
+      console.error('[JOB] Error resolviendo ofertas caducadas:', e)
+    }
+  }
+
+  ejecutarResolucion() // ejecutar también al arrancar
+  setInterval(ejecutarResolucion, 60 * 60 * 1000) // cada hora
 })

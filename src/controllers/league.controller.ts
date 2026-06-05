@@ -16,6 +16,7 @@ const CUPOS: Record<Posicion, number> = {
   DEFENSA: 5,
   CENTROCAMPISTA: 5,
   DELANTERO: 4,
+  UNKNOWN: 0,
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -29,17 +30,21 @@ export async function asignarJugadoresIniciales(
   tx: Omit<typeof prisma, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>
 ) {
   // Jugadores ya asignados en esta liga (propiedad exclusiva por liga)
-  const ocupados = await tx.jugadorEquipo.findMany({
+  const ocupados = await tx.plantillaFantasy.findMany({
     where: { ligaId },
     select: { jugadorId: true },
   })
-  const idsOcupados = ocupados.map(je => je.jugadorId)
+  const idsOcupados = ocupados.map(pf => pf.jugadorId)
 
-  const posiciones = Object.keys(CUPOS) as Posicion[]
+  const posiciones = (Object.keys(CUPOS) as Posicion[]).filter(p => CUPOS[p] > 0)
   const lotes = await Promise.all(
     posiciones.map(pos =>
       tx.jugador.findMany({
-        where: { division, posicion: pos, id: { notIn: idsOcupados } },
+        where: {
+          posicion: pos,
+          id: { notIn: idsOcupados },
+          historialEquipos: { some: { activo: true, equipo: { division } } },
+        },
       })
     )
   )
@@ -52,7 +57,7 @@ export async function asignarJugadoresIniciales(
     throw new Error(`No hay suficientes jugadores libres en la división ${division} para formar un equipo completo`)
   }
 
-  await tx.jugadorEquipo.createMany({
+  await tx.plantillaFantasy.createMany({
     data: seleccionados.map(j => ({
       ligaId,
       miembroLigaId,
@@ -74,7 +79,7 @@ export const crearLiga = async (req: AuthRequest, res: Response) => {
   }
 
   if (!Object.values(Division).includes(division)) {
-    res.status(400).json({ error: 'division debe ser A, B o C' })
+    res.status(400).json({ error: `division debe ser uno de: ${Object.values(Division).join(', ')}` })
     return
   }
 
@@ -243,6 +248,7 @@ export const getLiga = async (req: AuthRequest, res: Response) => {
       where: { id: ligaId },
       include: {
         miembros: {
+          where: { usuario: { activo: true } },
           include: { usuario: { select: { id: true, username: true } } },
           orderBy: { puntuacion: 'desc' },
         },
@@ -260,7 +266,6 @@ export const getLiga = async (req: AuthRequest, res: Response) => {
       return
     }
 
-    // Ocultar presupuesto de otros miembros
     const miembrosPublicos = liga.miembros.map(m => {
       if (m.usuarioId === usuarioId) return m
       const { presupuestoRestante: _, ...sinPresupuesto } = m
@@ -295,9 +300,15 @@ export const getMiEquipo = async (req: AuthRequest, res: Response) => {
       return
     }
 
-    const jugadores = await prisma.jugadorEquipo.findMany({
+    const jugadores = await prisma.plantillaFantasy.findMany({
       where: { miembroLigaId: miembro.id },
-      include: { jugador: true },
+      include: {
+        jugador: {
+          include: {
+            historialEquipos: { where: { activo: true }, include: { equipo: true }, take: 1 },
+          },
+        },
+      },
     })
 
     res.json(jugadores)
@@ -327,21 +338,140 @@ export const getJugadoresDisponibles = async (req: AuthRequest, res: Response) =
       return
     }
 
-    // Con propiedad exclusiva, "disponible" = no está en NINGÚN equipo de esta liga
-    const asignados = await prisma.jugadorEquipo.findMany({
+    const asignados = await prisma.plantillaFantasy.findMany({
       where: { ligaId },
       select: { jugadorId: true },
     })
-    const idsAsignados = asignados.map(j => j.jugadorId)
+    const idsAsignados = asignados.map(pf => pf.jugadorId)
 
     const disponibles = await prisma.jugador.findMany({
-      where: { division: liga.division, id: { notIn: idsAsignados } },
+      where: {
+        id: { notIn: idsAsignados },
+        historialEquipos: { some: { activo: true, equipo: { division: liga.division } } },
+      },
+      include: {
+        historialEquipos: { where: { activo: true }, include: { equipo: true }, take: 1 },
+      },
       orderBy: { valor: 'desc' },
     })
 
     res.json(disponibles)
   } catch {
     res.status(500).json({ error: 'Error al obtener jugadores disponibles' })
+  }
+}
+
+// ─── ÚLTIMA JORNADA STATS (para listas de jugadores) ─
+
+export const getUltimaJornadaStats = async (req: AuthRequest, res: Response) => {
+  const ligaId = req.params.ligaId as string
+
+  try {
+    const liga = await prisma.liga.findUnique({ where: { id: ligaId } })
+    if (!liga) { res.status(404).json({ error: 'Liga no encontrada' }); return }
+
+    const ultimaJornada = await prisma.jornada.findFirst({
+      where: { division: liga.division, estadisticas: { some: {} } },
+      orderBy: { numJornada: 'desc' },
+    })
+
+    if (!ultimaJornada) { res.json({ jornada: null, stats: {} }); return }
+
+    const estadisticas = await prisma.estadisticaJornada.findMany({
+      where: { jornadaId: ultimaJornada.id },
+      include: { jugadorEquipo: { select: { jugadorId: true } } },
+    })
+
+    const stats: Record<string, object> = {}
+    for (const e of estadisticas) {
+      stats[e.jugadorEquipo.jugadorId] = {
+        puntos: e.puntosCalculados,
+        convocado: e.convocado,
+        titular: e.titular,
+        minutosJugados: e.minutosJugados,
+        goles: e.goles,
+        resultado: e.resultado,
+      }
+    }
+
+    res.json({ jornada: { id: ultimaJornada.id, numJornada: ultimaJornada.numJornada }, stats })
+  } catch {
+    res.status(500).json({ error: 'Error al obtener stats' })
+  }
+}
+
+// ─── HISTORIAL DE ALINEACIONES ─────────────────────
+
+export const getHistorialAlineaciones = async (req: AuthRequest, res: Response) => {
+  const ligaId = req.params.ligaId as string
+  const usuarioId = req.usuarioId!
+
+  try {
+    const miembro = await prisma.miembroLiga.findUnique({
+      where: { ligaId_usuarioId: { ligaId, usuarioId } },
+    })
+    if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
+
+    const jornadas = await prisma.jornada.findMany({
+      where: { snapshots: { some: { miembroLigaId: miembro.id } } },
+      orderBy: { numJornada: 'desc' },
+    })
+
+    const POS_ORDER = ['PORTERO', 'DEFENSA', 'CENTROCAMPISTA', 'DELANTERO', 'UNKNOWN']
+
+    const historial = await Promise.all(jornadas.map(async jornada => {
+      const [snaps, puntuacion] = await Promise.all([
+        prisma.snapshotAlineacion.findMany({
+          where: { jornadaId: jornada.id, miembroLigaId: miembro.id },
+          include: {
+            jugadorEquipo: {
+              include: {
+                jugador: true,
+                estadisticas: { where: { jornadaId: jornada.id } },
+              },
+            },
+          },
+        }),
+        prisma.puntuacionJornada.findUnique({
+          where: { jornadaId_miembroLigaId: { jornadaId: jornada.id, miembroLigaId: miembro.id } },
+        }),
+      ])
+
+      const jugadores = snaps
+        .map(s => {
+          const stats = s.jugadorEquipo.estadisticas[0] ?? null
+          const puntos = stats
+            ? (s.esCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados)
+            : null
+          return {
+            jugador: {
+              nombreCompleto: s.jugadorEquipo.jugador.nombreCompleto,
+              posicion: s.jugadorEquipo.jugador.posicion,
+            },
+            esCapitan: s.esCapitan,
+            estadistica: stats
+              ? {
+                  convocado: stats.convocado, titular: stats.titular,
+                  minutosJugados: stats.minutosJugados, goles: stats.goles,
+                  tarjetasAmarillas: stats.tarjetasAmarillas, tarjetaRoja: stats.tarjetaRoja,
+                  resultado: stats.resultado, desglose: stats.desglose,
+                }
+              : null,
+            puntos,
+          }
+        })
+        .sort((a, b) => POS_ORDER.indexOf(a.jugador.posicion) - POS_ORDER.indexOf(b.jugador.posicion))
+
+      return {
+        jornada: { id: jornada.id, numJornada: jornada.numJornada, fechaCierre: jornada.fechaCierre },
+        totalPuntos: puntuacion?.puntos ?? null,
+        jugadores,
+      }
+    }))
+
+    res.json(historial)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener historial' })
   }
 }
 
@@ -411,12 +541,11 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
       return
     }
 
-    // Verificar que todos los jugadores son del equipo
-    const miEquipo = await prisma.jugadorEquipo.findMany({
+    const miEquipo = await prisma.plantillaFantasy.findMany({
       where: { miembroLigaId: miembro.id },
       include: { jugador: true },
     })
-    const misIds = new Set(miEquipo.map(je => je.jugadorId))
+    const misIds = new Set(miEquipo.map(pf => pf.jugadorId))
 
     for (const id of jugadorIds) {
       if (!misIds.has(id)) {
@@ -425,12 +554,11 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // Verificar conteo por posición
     const slots = SLOTS_FORMACION[formacion]
     const conteo: Record<string, number> = {}
     for (const id of jugadorIds) {
-      const je = miEquipo.find(je => je.jugadorId === id)!
-      const pos = je.jugador.posicion
+      const pf = miEquipo.find(pf => pf.jugadorId === id)!
+      const pos = pf.jugador.posicion
       conteo[pos] = (conteo[pos] ?? 0) + 1
     }
 
@@ -443,13 +571,11 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // El capitán debe ser uno de los 11 titulares (o null para quitar)
     if (capitanId && !jugadorIds.includes(capitanId)) {
       res.status(400).json({ error: 'El capitán debe ser uno de los 11 titulares' })
       return
     }
 
-    // Guardar en transacción
     await prisma.$transaction(async tx => {
       await tx.titularLiga.deleteMany({ where: { miembroLigaId: miembro.id } })
       await tx.titularLiga.createMany({

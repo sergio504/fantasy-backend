@@ -32,3 +32,26 @@ export const getJugadorPorId = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al obtener jugador' })
   }
 }
+
+export const getEstadisticasJugador = async (req: Request, res: Response) => {
+  const id = req.params.id as string
+
+  try {
+    const jugadorEquipos = await prisma.jugadorEquipo.findMany({
+      where: { jugadorId: id },
+      select: { id: true },
+    })
+
+    const estadisticas = await prisma.estadisticaJornada.findMany({
+      where: { jugadorEquipoId: { in: jugadorEquipos.map(je => je.id) } },
+      include: {
+        jornada: { select: { numJornada: true, division: true, fechaCierre: true } },
+      },
+      orderBy: { jornada: { numJornada: 'asc' } },
+    })
+
+    res.json(estadisticas)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener estadísticas' })
+  }
+}
