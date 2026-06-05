@@ -9,12 +9,14 @@ import {
   getConfigPuntuacion, actualizarConfigPuntuacion,
   getUsuarios, toggleActivoUsuario,
   lanzarMercadoManual,
+  getDashboard,
 } from '../controllers/admin.controller'
 
 const router = Router()
 
 router.use(authMiddleware, adminMiddleware)
 
+router.get('/dashboard',               getDashboard)
 router.get('/jugadores',           getJugadoresAdmin)
 router.post('/jugadores',          crearJugador)
 router.patch('/jugadores/:id',     editarJugador)

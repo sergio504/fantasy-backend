@@ -62,11 +62,12 @@ enum ResultadoPartido {
 // ─── USUARIO ───────────────────────────────────────
 
 model Usuario {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  username   String   @unique
-  contrasena String
-  creadoEn   DateTime @default(now())
+  id           String    @id @default(uuid())
+  email        String    @unique
+  username     String    @unique
+  contrasena   String
+  creadoEn     DateTime  @default(now())
+  ultimoAcceso DateTime?
 
   esAdmin      Boolean       @default(false)
   activo       Boolean       @default(true)

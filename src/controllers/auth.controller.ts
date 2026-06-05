@@ -34,12 +34,14 @@ export const login = async (req: Request, res: Response) => {
       return
     }
 
-    const token = jwt.sign({ usuarioId: usuario.id }, process.env.JWT_SECRET!, { expiresIn: '7d' })
     if (!usuario.activo) {
       res.status(403).json({ error: 'Tu cuenta está desactivada. Contacta con el administrador.' })
       return
     }
 
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { ultimoAcceso: new Date() } })
+
+    const token = jwt.sign({ usuarioId: usuario.id }, process.env.JWT_SECRET!, { expiresIn: '7d' })
     res.json({ token, usuario: { id: usuario.id, email: usuario.email, username: usuario.username, esAdmin: usuario.esAdmin, activo: usuario.activo } })
   } catch {
     res.status(500).json({ error: 'Error del servidor' })

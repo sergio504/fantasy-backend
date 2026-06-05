@@ -371,6 +371,60 @@ export const lanzarMercadoManual = async (req: AuthRequest, res: Response) => {
   }
 }
 
+// ─── DASHBOARD ─────────────────────────────────────
+
+export const getDashboard = async (_req: AuthRequest, res: Response) => {
+  try {
+    const ahora = new Date()
+    const haceUnaSemana = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+    const [
+      totalUsuarios,
+      nuevosUltimaSemana,
+      accesosUltimaSemana,
+      ligasPublicas,
+      ligasPrivadas,
+      totalJugadores,
+      ofertasActivas,
+      ofertasVendidas,
+      ofertasCanceladas,
+      totalPujas,
+      usuariosRecientes,
+    ] = await Promise.all([
+      prisma.usuario.count(),
+      prisma.usuario.count({ where: { creadoEn: { gte: haceUnaSemana } } }),
+      prisma.usuario.count({ where: { ultimoAcceso: { gte: haceUnaSemana } } }),
+      prisma.liga.count({ where: { publica: true } }),
+      prisma.liga.count({ where: { publica: false } }),
+      prisma.jugador.count(),
+      prisma.ofertaMercado.count({ where: { estado: 'ACTIVA' } }),
+      prisma.ofertaMercado.count({ where: { estado: 'VENDIDA' } }),
+      prisma.ofertaMercado.count({ where: { estado: 'CANCELADA' } }),
+      prisma.puja.count(),
+      prisma.usuario.findMany({ where: { creadoEn: { gte: haceUnaSemana } }, select: { creadoEn: true } }),
+    ])
+
+    const registrosPorDia: { dia: string; usuarios: number }[] = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(ahora)
+      d.setDate(d.getDate() - i)
+      const diaStr = d.toISOString().split('T')[0]
+      const count = usuariosRecientes.filter(u => u.creadoEn.toISOString().split('T')[0] === diaStr).length
+      registrosPorDia.push({ dia: diaStr, usuarios: count })
+    }
+
+    res.json({
+      usuarios: { total: totalUsuarios, nuevosUltimaSemana, accesosUltimaSemana },
+      ligas: { publicas: ligasPublicas, privadas: ligasPrivadas, total: ligasPublicas + ligasPrivadas },
+      jugadores: { total: totalJugadores },
+      mercado: { ofertasActivas, ofertasVendidas, ofertasCanceladas, totalPujas },
+      registrosPorDia,
+    })
+  } catch {
+    res.status(500).json({ error: 'Error al obtener dashboard' })
+  }
+}
+
 // ─── HISTORIAL ─────────────────────────────────────
 
 export const getHistorial = async (_req: AuthRequest, res: Response) => {
