@@ -1,5 +1,9 @@
 import path from 'path'
 import { defineConfig } from 'prisma/config'
+import { PrismaPg } from '@prisma/adapter-pg'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export default defineConfig({
   earlyAccess: true,
@@ -9,9 +13,7 @@ export default defineConfig({
   },
   migrate: {
     async adapter() {
-      const { PrismaPg } = await import('@prisma/adapter-pg')
-      const connectionString = process.env.DATABASE_URL!
-      return new PrismaPg({ connectionString })
+      return new PrismaPg({ connectionString: process.env.DATABASE_URL! })
     }
   }
 })
