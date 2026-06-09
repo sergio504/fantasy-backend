@@ -1,60 +1,46 @@
-import { prisma } from '../prismaClient'
+import { randomUUID } from 'crypto'
+import { eq, and, desc, sql } from 'drizzle-orm'
+import { db } from '../db'
+import { ofertaMercado, puja, plantillaFantasy, miembroLiga, transferencia } from '../db/schema'
 
-// Cierra una oferta (por caducidad o por acción del vendedor).
-// Funciona tanto para ofertas de usuario (vendedorId != null) como del sistema (vendedorId = null).
 export async function cerrarOfertaLogic(ofertaId: string) {
-  const oferta = await prisma.ofertaMercado.findUnique({
-    where: { id: ofertaId },
-    include: { pujas: { orderBy: { cantidad: 'desc' }, take: 1 } },
+  const oferta = await db.query.ofertaMercado.findFirst({
+    where: eq(ofertaMercado.id, ofertaId),
+    with: { pujas: { orderBy: desc(puja.cantidad), limit: 1 } },
   })
 
   if (!oferta || oferta.estado !== 'ACTIVA') return null
 
-  return prisma.$transaction(async tx => {
+  return db.transaction(async tx => {
     const mejorPuja = oferta.pujas[0]
 
     if (!mejorPuja) {
-      await tx.ofertaMercado.update({ where: { id: ofertaId }, data: { estado: 'CANCELADA' } })
+      await tx.update(ofertaMercado).set({ estado: 'CANCELADA' }).where(eq(ofertaMercado.id, ofertaId))
       return { resultado: 'CANCELADA' as const }
     }
 
-    await tx.ofertaMercado.update({ where: { id: ofertaId }, data: { estado: 'VENDIDA' } })
+    await tx.update(ofertaMercado).set({ estado: 'VENDIDA' }).where(eq(ofertaMercado.id, ofertaId))
 
-    // Oferta de usuario: quitarle el jugador y devolverle el dinero
     if (oferta.vendedorId) {
-      await tx.plantillaFantasy.delete({
-        where: { ligaId_jugadorId: { ligaId: oferta.ligaId, jugadorId: oferta.jugadorId } },
-      })
-      await tx.miembroLiga.update({
-        where: { id: oferta.vendedorId },
-        data: { presupuestoRestante: { increment: mejorPuja.cantidad } },
-      })
+      await tx.delete(plantillaFantasy).where(
+        and(eq(plantillaFantasy.ligaId, oferta.ligaId), eq(plantillaFantasy.jugadorId, oferta.jugadorId))
+      )
+      await tx.update(miembroLiga)
+        .set({ presupuestoRestante: sql`${miembroLiga.presupuestoRestante} + ${mejorPuja.cantidad}` })
+        .where(eq(miembroLiga.id, oferta.vendedorId))
     }
-    // Oferta del sistema: el jugador no está en ninguna plantilla, nada que quitar
 
-    // Añadir jugador al comprador y descontarle el dinero
-    await tx.plantillaFantasy.create({
-      data: {
-        ligaId: oferta.ligaId,
-        miembroLigaId: mejorPuja.miembroLigaId,
-        jugadorId: oferta.jugadorId,
-        precioCompra: mejorPuja.cantidad,
-      },
+    await tx.insert(plantillaFantasy).values({
+      id: randomUUID(), ligaId: oferta.ligaId, miembroLigaId: mejorPuja.miembroLigaId,
+      jugadorId: oferta.jugadorId, precioCompra: mejorPuja.cantidad, creadoEn: new Date(),
     })
-    await tx.miembroLiga.update({
-      where: { id: mejorPuja.miembroLigaId },
-      data: { presupuestoRestante: { decrement: mejorPuja.cantidad } },
-    })
-
-    await tx.transferencia.create({
-      data: {
-        jugadorId: oferta.jugadorId,
-        ligaId: oferta.ligaId,
-        vendedorId: oferta.vendedorId ?? null,
-        compradorId: mejorPuja.miembroLigaId,
-        ofertaId,
-        precio: mejorPuja.cantidad,
-      },
+    await tx.update(miembroLiga)
+      .set({ presupuestoRestante: sql`${miembroLiga.presupuestoRestante} - ${mejorPuja.cantidad}` })
+      .where(eq(miembroLiga.id, mejorPuja.miembroLigaId))
+    await tx.insert(transferencia).values({
+      id: randomUUID(), jugadorId: oferta.jugadorId, ligaId: oferta.ligaId,
+      vendedorId: oferta.vendedorId ?? null, compradorId: mejorPuja.miembroLigaId,
+      ofertaId, precio: mejorPuja.cantidad, fecha: new Date(),
     })
 
     return { resultado: 'VENDIDA' as const, compradorId: mejorPuja.miembroLigaId, precio: mejorPuja.cantidad }

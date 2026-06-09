@@ -1,5 +1,6 @@
-import { TipoAccionAdmin } from '@prisma/client'
-import { prisma } from '../prismaClient'
+import { randomUUID } from 'crypto'
+import { db } from '../db'
+import { historialAdmin, TipoAccionAdmin } from '../db/schema'
 
 export async function registrarAccion(
   adminId: string,
@@ -9,14 +10,14 @@ export async function registrarAccion(
   datosDespues: object,
   datosAntes?: object
 ) {
-  await prisma.historialAdmin.create({
-    data: {
-      adminId,
-      accion,
-      entidad,
-      entidadId,
-      datosDespues,
-      datosAntes: datosAntes ?? undefined,
-    },
+  await db.insert(historialAdmin).values({
+    id:           randomUUID(),
+    adminId,
+    accion,
+    entidad,
+    entidadId,
+    datosDespues,
+    datosAntes:   datosAntes ?? null,
+    creadoEn:     new Date(),
   })
 }

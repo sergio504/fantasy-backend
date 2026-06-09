@@ -1,4 +1,7 @@
-import { prisma } from '../prismaClient'
+import { randomUUID } from 'crypto'
+import { eq, and, isNull, gte, lte, notInArray, count } from 'drizzle-orm'
+import { db } from '../db'
+import { liga, miembroLiga, ofertaMercado, plantillaFantasy, jugador, jugadorEquipo, equipo } from '../db/schema'
 import { cerrarOfertaLogic } from '../lib/cerrarOfertaLogic'
 
 const JUGADORES_POR_EJECUCION = 15
@@ -10,73 +13,41 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export async function ponerJugadoresEnMercado(): Promise<{ ligaId: string; nombre: string; añadidos: number }[]> {
-  const ligas = await prisma.liga.findMany({
-    where: { miembros: { some: {} } },
-  })
-
+  const ligas = await db.query.liga.findMany({ with: { miembros: { limit: 1 } } })
+  const ligasConMiembros = ligas.filter(l => l.miembros.length > 0)
   const resumen: { ligaId: string; nombre: string; añadidos: number }[] = []
 
-  for (const liga of ligas) {
-    // Comprobar si ya hay ofertas de sistema recientes (< INTERVALO_DIAS días)
+  for (const l of ligasConMiembros) {
     const limiteAntigüedad = new Date()
     limiteAntigüedad.setDate(limiteAntigüedad.getDate() - INTERVALO_DIAS)
 
-    const ofertasRecientes = await prisma.ofertaMercado.count({
-      where: {
-        ligaId: liga.id,
-        vendedorId: null,
-        estado: 'ACTIVA',
-        creadoEn: { gte: limiteAntigüedad },
-      },
-    })
+    const [{ total: ofertasRecientes }] = await db.select({ total: count() }).from(ofertaMercado).where(
+      and(eq(ofertaMercado.ligaId, l.id), isNull(ofertaMercado.vendedorId), eq(ofertaMercado.estado, 'ACTIVA'), gte(ofertaMercado.creadoEn, limiteAntigüedad))
+    )
 
-    if (ofertasRecientes > 0) {
-      resumen.push({ ligaId: liga.id, nombre: liga.nombre, añadidos: 0 })
-      continue
-    }
+    if (ofertasRecientes > 0) { resumen.push({ ligaId: l.id, nombre: l.nombre, añadidos: 0 }); continue }
 
-    // Jugadores ya asignados o ya en oferta activa en esta liga
     const [asignados, enOferta] = await Promise.all([
-      prisma.plantillaFantasy.findMany({ where: { ligaId: liga.id }, select: { jugadorId: true } }),
-      prisma.ofertaMercado.findMany({ where: { ligaId: liga.id, estado: 'ACTIVA' }, select: { jugadorId: true } }),
+      db.select({ jugadorId: plantillaFantasy.jugadorId }).from(plantillaFantasy).where(eq(plantillaFantasy.ligaId, l.id)),
+      db.select({ jugadorId: ofertaMercado.jugadorId }).from(ofertaMercado).where(and(eq(ofertaMercado.ligaId, l.id), eq(ofertaMercado.estado, 'ACTIVA'))),
     ])
+    const idsExcluidos = [...asignados.map(p => p.jugadorId), ...enOferta.map(o => o.jugadorId)]
 
-    const idsExcluidos = new Set([
-      ...asignados.map(p => p.jugadorId),
-      ...enOferta.map(o => o.jugadorId),
-    ])
+    const libres = await db.selectDistinct({ id: jugador.id, valor: jugador.valor }).from(jugador)
+      .innerJoin(jugadorEquipo, and(eq(jugadorEquipo.jugadorId, jugador.id), eq(jugadorEquipo.activo, true)))
+      .innerJoin(equipo, and(eq(equipo.id, jugadorEquipo.equipoId), eq(equipo.division, l.division)))
+      .where(idsExcluidos.length > 0 ? notInArray(jugador.id, idsExcluidos) : undefined)
 
-    // Jugadores libres de la división de esta liga
-    const libres = await prisma.jugador.findMany({
-      where: {
-        id: { notIn: [...idsExcluidos] },
-        historialEquipos: { some: { activo: true, equipo: { division: liga.division } } },
-      },
-      select: { id: true, valor: true },
-    })
+    if (libres.length === 0) { resumen.push({ ligaId: l.id, nombre: l.nombre, añadidos: 0 }); continue }
 
-    if (libres.length === 0) {
-      resumen.push({ ligaId: liga.id, nombre: liga.nombre, añadidos: 0 })
-      continue
-    }
-
-    const seleccionados = shuffle(libres).slice(0, JUGADORES_POR_EJECUCION)
-
+    const seleccionados  = shuffle(libres).slice(0, JUGADORES_POR_EJECUCION)
     const fechaCaducidad = new Date()
     fechaCaducidad.setDate(fechaCaducidad.getDate() + CADUCIDAD_DIAS)
 
-    await prisma.ofertaMercado.createMany({
-      data: seleccionados.map(j => ({
-        ligaId: liga.id,
-        jugadorId: j.id,
-        vendedorId: null,        // oferta del sistema
-        precioMinimo: j.valor,
-        estado: 'ACTIVA' as const,
-        fechaCaducidad,
-      })),
-    })
-
-    resumen.push({ ligaId: liga.id, nombre: liga.nombre, añadidos: seleccionados.length })
+    await db.insert(ofertaMercado).values(
+      seleccionados.map(j => ({ id: randomUUID(), ligaId: l.id, jugadorId: j.id, vendedorId: null, precioMinimo: j.valor, estado: 'ACTIVA' as const, fechaCaducidad, creadoEn: new Date() }))
+    )
+    resumen.push({ ligaId: l.id, nombre: l.nombre, añadidos: seleccionados.length })
   }
 
   return resumen
@@ -84,18 +55,11 @@ export async function ponerJugadoresEnMercado(): Promise<{ ligaId: string; nombr
 
 export async function resolverOfertasCaducadas(): Promise<{ resueltas: number; canceladas: number }> {
   const ahora = new Date()
-
-  const caducadas = await prisma.ofertaMercado.findMany({
-    where: {
-      estado: 'ACTIVA',
-      fechaCaducidad: { lte: ahora },
-    },
-    select: { id: true },
-  })
+  const caducadas = await db.select({ id: ofertaMercado.id }).from(ofertaMercado)
+    .where(and(eq(ofertaMercado.estado, 'ACTIVA'), lte(ofertaMercado.fechaCaducidad, ahora)))
 
   let resueltas = 0
   let canceladas = 0
-
   for (const oferta of caducadas) {
     try {
       const resultado = await cerrarOfertaLogic(oferta.id)
@@ -105,6 +69,5 @@ export async function resolverOfertasCaducadas(): Promise<{ resueltas: number; c
       console.error(`[JOB] Error al resolver oferta ${oferta.id}:`, e)
     }
   }
-
   return { resueltas, canceladas }
 }

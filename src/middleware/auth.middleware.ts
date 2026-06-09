@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { prisma } from '../prismaClient'
+import { db } from '../db'
+import { usuario } from '../db/schema'
+import { eq } from 'drizzle-orm'
 
 export interface AuthRequest extends Request {
   usuarioId?: string
@@ -17,17 +19,17 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { usuarioId: string }
 
-    const usuario = await prisma.usuario.findUnique({
-      where: { id: decoded.usuarioId },
-      select: { id: true, activo: true },
-    })
+    const [user] = await db.select({ id: usuario.id, activo: usuario.activo })
+      .from(usuario)
+      .where(eq(usuario.id, decoded.usuarioId))
+      .limit(1)
 
-    if (!usuario) {
+    if (!user) {
       res.status(401).json({ error: 'Usuario no encontrado' })
       return
     }
 
-    if (!usuario.activo) {
+    if (!user.activo) {
       res.status(403).json({ error: 'Tu cuenta está desactivada. Contacta con el administrador.' })
       return
     }
