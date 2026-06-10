@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { eq, and, notInArray, inArray, count, desc, exists } from 'drizzle-orm'
 import { db } from '../db'
 import {
-  liga, miembroLiga, jugador, jugadorEquipo, equipo,
+  liga, miembroLiga, jugador, jugadorEquipo, equipo, usuario,
   plantillaFantasy, titularLiga, snapshotAlineacion, jornada,
   estadisticaJornada, puntuacionJornada,
   Division, Posicion,
@@ -73,7 +73,9 @@ export const crearLiga = async (req: AuthRequest, res: Response) => {
       await tx.insert(liga).values({ id: ligaId, nombre, creadorId, division, publica: esPublica, codigoInvitacion, maxEquipos: maxEquipos ?? 10, presupuestoInicial: presupuesto, creadoEn: now })
       await tx.insert(miembroLiga).values({ id: miembroId, ligaId, usuarioId: creadorId, presupuestoRestante: presupuesto, creadoEn: now })
       await asignarJugadoresIniciales(miembroId, ligaId, division, tx as any)
-      return tx.query.liga.findFirst({ where: eq(liga.id, ligaId), with: { miembros: true } })
+      const [l] = await tx.select().from(liga).where(eq(liga.id, ligaId)).limit(1)
+      const miembros = await tx.select().from(miembroLiga).where(eq(miembroLiga.ligaId, ligaId))
+      return { ...l!, miembros }
     })
     res.status(201).json(ligaCreada)
   } catch (e: any) {
@@ -160,15 +162,18 @@ export const getLigasPublicas = async (_req: Request, res: Response) => {
 export const getMisLigas = async (req: AuthRequest, res: Response) => {
   const usuarioId = req.usuarioId!
   try {
-    const membresias = await db.query.miembroLiga.findMany({ where: eq(miembroLiga.usuarioId, usuarioId), with: { liga: true } })
-    const ligaIds    = membresias.map(m => m.ligaId)
-    const countMap   = new Map<string, number>()
-    if (ligaIds.length > 0) {
-      const counts = await db.select({ ligaId: miembroLiga.ligaId, total: count() })
-        .from(miembroLiga).where(inArray(miembroLiga.ligaId, ligaIds)).groupBy(miembroLiga.ligaId)
-      counts.forEach(c => countMap.set(c.ligaId, c.total))
-    }
-    res.json(membresias.map(m => ({ ...m, liga: { ...m.liga, _count: { miembros: countMap.get(m.ligaId) ?? 0 } } })))
+    const membresiasRaw = await db.select().from(miembroLiga).where(eq(miembroLiga.usuarioId, usuarioId))
+    const ligaIds       = membresiasRaw.map(m => m.ligaId)
+    if (ligaIds.length === 0) { res.json([]); return }
+
+    const [ligasRaw, counts] = await Promise.all([
+      db.select().from(liga).where(inArray(liga.id, ligaIds)),
+      db.select({ ligaId: miembroLiga.ligaId, total: count() })
+        .from(miembroLiga).where(inArray(miembroLiga.ligaId, ligaIds)).groupBy(miembroLiga.ligaId),
+    ])
+    const ligaMap  = new Map(ligasRaw.map(l => [l.id, l]))
+    const countMap = new Map(counts.map(c => [c.ligaId, c.total]))
+    res.json(membresiasRaw.map(m => ({ ...m, liga: { ...ligaMap.get(m.ligaId)!, _count: { miembros: countMap.get(m.ligaId) ?? 0 } } })))
   } catch {
     res.status(500).json({ error: 'Error al obtener tus ligas' })
   }
@@ -181,13 +186,29 @@ export const getLiga = async (req: AuthRequest, res: Response) => {
   const usuarioId = req.usuarioId!
 
   try {
-    const ligaData = await db.query.liga.findFirst({
-      where: eq(liga.id, ligaId),
-      with:  { miembros: { orderBy: desc(miembroLiga.puntuacion), with: { usuario: { columns: { id: true, username: true, activo: true } } } } },
-    })
+    const [ligaData] = await db.select().from(liga).where(eq(liga.id, ligaId)).limit(1)
     if (!ligaData) { res.status(404).json({ error: 'Liga no encontrada' }); return }
 
-    const miembrosActivos = ligaData.miembros.filter(m => m.usuario.activo)
+    const miembrosRaw = await db
+      .select({
+        id: miembroLiga.id, ligaId: miembroLiga.ligaId, usuarioId: miembroLiga.usuarioId,
+        presupuestoRestante: miembroLiga.presupuestoRestante, puntuacion: miembroLiga.puntuacion,
+        formacion: miembroLiga.formacion, capitanId: miembroLiga.capitanId, creadoEn: miembroLiga.creadoEn,
+        uId: usuario.id, uUsername: usuario.username, uActivo: usuario.activo,
+      })
+      .from(miembroLiga)
+      .innerJoin(usuario, eq(usuario.id, miembroLiga.usuarioId))
+      .where(eq(miembroLiga.ligaId, ligaId))
+      .orderBy(desc(miembroLiga.puntuacion))
+
+    const miembros = miembrosRaw.map(m => ({
+      id: m.id, ligaId: m.ligaId, usuarioId: m.usuarioId,
+      presupuestoRestante: m.presupuestoRestante, puntuacion: m.puntuacion,
+      formacion: m.formacion, capitanId: m.capitanId, creadoEn: m.creadoEn,
+      usuario: { id: m.uId, username: m.uUsername, activo: m.uActivo },
+    }))
+
+    const miembrosActivos = miembros.filter(m => m.usuario.activo)
     const esMiembro       = miembrosActivos.some(m => m.usuarioId === usuarioId)
 
     if (!esMiembro && !ligaData.publica) { res.status(403).json({ error: 'No tienes acceso a esta liga' }); return }
@@ -219,11 +240,56 @@ export const getMiEquipo = async (req: AuthRequest, res: Response) => {
     const miembro = await db.query.miembroLiga.findFirst({ where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)) })
     if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
 
-    const jugadores = await db.query.plantillaFantasy.findMany({
-      where: eq(plantillaFantasy.miembroLigaId, miembro.id),
-      with:  { jugador: { with: { historialEquipos: { where: eq(jugadorEquipo.activo, true), limit: 1, with: { equipo: true } } } } },
-    })
-    res.json(jugadores)
+    const plantillaRaw = await db
+      .select({
+        pfId: plantillaFantasy.id, pfLigaId: plantillaFantasy.ligaId,
+        pfMiembroLigaId: plantillaFantasy.miembroLigaId, pfJugadorId: plantillaFantasy.jugadorId,
+        pfPrecioCompra: plantillaFantasy.precioCompra, pfCreadoEn: plantillaFantasy.creadoEn,
+        jId: jugador.id, jNombreCompleto: jugador.nombreCompleto, jNombre: jugador.nombre,
+        jDorsal: jugador.dorsal, jFechaNacimiento: jugador.fechaNacimiento, jEdad: jugador.edad,
+        jPosicion: jugador.posicion, jValor: jugador.valor, jCreadoEn: jugador.creadoEn,
+      })
+      .from(plantillaFantasy)
+      .innerJoin(jugador, eq(jugador.id, plantillaFantasy.jugadorId))
+      .where(eq(plantillaFantasy.miembroLigaId, miembro.id))
+
+    const jugadorIds = plantillaRaw.map(p => p.pfJugadorId)
+    const equiposActivos = jugadorIds.length > 0
+      ? await db.select({
+            jeJugadorId: jugadorEquipo.jugadorId, jeId: jugadorEquipo.id,
+            jeEquipoId: jugadorEquipo.equipoId, jeDesde: jugadorEquipo.desde,
+            jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+            eId: equipo.id, eNombre: equipo.nombre, eDivision: equipo.division, eCreadoEn: equipo.creadoEn,
+          })
+          .from(jugadorEquipo)
+          .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+          .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, jugadorIds)))
+      : []
+    const histMap = new Map(equiposActivos.map(r => [r.jeJugadorId, {
+      id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
+      desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
+      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+    }]))
+
+    const titularesSet = new Set(
+      jugadorIds.length > 0
+        ? (await db.select({ jugadorId: titularLiga.jugadorId })
+            .from(titularLiga).where(eq(titularLiga.miembroLigaId, miembro.id))
+          ).map(t => t.jugadorId)
+        : []
+    )
+
+    res.json(plantillaRaw.map(p => ({
+      id: p.pfId, ligaId: p.pfLigaId, miembroLigaId: p.pfMiembroLigaId,
+      jugadorId: p.pfJugadorId, precioCompra: p.pfPrecioCompra, creadoEn: p.pfCreadoEn,
+      esTitular: titularesSet.has(p.pfJugadorId),
+      jugador: {
+        id: p.jId, nombreCompleto: p.jNombreCompleto, nombre: p.jNombre,
+        dorsal: p.jDorsal, fechaNacimiento: p.jFechaNacimiento, edad: p.jEdad,
+        posicion: p.jPosicion, valor: p.jValor, creadoEn: p.jCreadoEn,
+        historialEquipos: histMap.has(p.pfJugadorId) ? [histMap.get(p.pfJugadorId)!] : [],
+      },
+    })))
   } catch {
     res.status(500).json({ error: 'Error al obtener tu equipo' })
   }
@@ -253,12 +319,26 @@ export const getJugadoresDisponibles = async (req: AuthRequest, res: Response) =
     const ids = disponibleIds.map(r => r.id)
     if (ids.length === 0) { res.json([]); return }
 
-    const disponibles = await db.query.jugador.findMany({
-      where:   inArray(jugador.id, ids),
-      orderBy: desc(jugador.valor),
-      with:    { historialEquipos: { where: eq(jugadorEquipo.activo, true), limit: 1, with: { equipo: true } } },
-    })
-    res.json(disponibles)
+    const jugadores = await db.select().from(jugador)
+      .where(inArray(jugador.id, ids))
+      .orderBy(desc(jugador.valor))
+
+    const equiposActivos = await db.select({
+          jeJugadorId: jugadorEquipo.jugadorId, jeId: jugadorEquipo.id,
+          jeEquipoId: jugadorEquipo.equipoId, jeDesde: jugadorEquipo.desde,
+          jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+          eId: equipo.id, eNombre: equipo.nombre, eDivision: equipo.division, eCreadoEn: equipo.creadoEn,
+        })
+      .from(jugadorEquipo)
+      .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+      .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, ids)))
+
+    const histMap = new Map(equiposActivos.map(r => [r.jeJugadorId, {
+      id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
+      desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
+      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+    }]))
+    res.json(jugadores.map(j => ({ ...j, historialEquipos: histMap.has(j.id) ? [histMap.get(j.id)!] : [] })))
   } catch {
     res.status(500).json({ error: 'Error al obtener jugadores disponibles' })
   }
@@ -279,16 +359,36 @@ export const getUltimaJornadaStats = async (req: AuthRequest, res: Response) => 
     })
     if (!ultimaJornada) { res.json({ jornada: null, stats: {} }); return }
 
-    const estadisticas = await db.query.estadisticaJornada.findMany({
-      where: eq(estadisticaJornada.jornadaId, ultimaJornada.id),
-      with:  { jugadorEquipo: { columns: { jugadorId: true } } },
+    const todasLasJornadas = await db.query.jornada.findMany({
+      where: and(eq(jornada.division, ligaData.division)),
     })
+    const jornadaIds = todasLasJornadas.map(j => j.id)
+
+    const estadisticas = await db
+      .select({
+        jeJugadorId: jugadorEquipo.jugadorId,
+        puntosCalculados: estadisticaJornada.puntosCalculados,
+        convocado: estadisticaJornada.convocado,
+        titular: estadisticaJornada.titular,
+        minutosJugados: estadisticaJornada.minutosJugados,
+        goles: estadisticaJornada.goles,
+        resultado: estadisticaJornada.resultado,
+      })
+      .from(estadisticaJornada)
+      .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, estadisticaJornada.jugadorEquipoId))
+      .where(inArray(estadisticaJornada.jornadaId, jornadaIds))
 
     const stats: Record<string, object> = {}
     for (const e of estadisticas) {
-      stats[e.jugadorEquipo.jugadorId] = {
-        puntos: e.puntosCalculados, convocado: e.convocado, titular: e.titular,
-        minutosJugados: e.minutosJugados, goles: e.goles, resultado: e.resultado,
+      const existing = stats[e.jeJugadorId] as any
+      if (existing) {
+        existing.puntos += e.puntosCalculados
+        existing.goles  += e.goles
+      } else {
+        stats[e.jeJugadorId] = {
+          puntos: e.puntosCalculados, convocado: e.convocado, titular: e.titular,
+          minutosJugados: e.minutosJugados, goles: e.goles, resultado: e.resultado,
+        }
       }
     }
     res.json({ jornada: { id: ultimaJornada.id, numJornada: ultimaJornada.numJornada }, stats })
@@ -318,30 +418,38 @@ export const getHistorialAlineaciones = async (req: AuthRequest, res: Response) 
     })
 
     const historial = await Promise.all(jornadas.map(async j => {
-      const [snaps, puntuacion] = await Promise.all([
-        db.query.snapshotAlineacion.findMany({
-          where: and(eq(snapshotAlineacion.jornadaId, j.id), eq(snapshotAlineacion.miembroLigaId, miembro.id)),
-          with:  {
-            jugadorEquipo: {
-              with: {
-                jugador: true,
-                estadisticas: { where: eq(estadisticaJornada.jornadaId, j.id) },
-              },
-            },
-          },
-        }),
+      const [snapsRaw, puntuacion] = await Promise.all([
+        db.select({
+            snapId: snapshotAlineacion.id, snapJornadaId: snapshotAlineacion.jornadaId,
+            snapMiembroLigaId: snapshotAlineacion.miembroLigaId,
+            snapJugadorEquipoId: snapshotAlineacion.jugadorEquipoId,
+            snapEsCapitan: snapshotAlineacion.esCapitan, snapCreadoEn: snapshotAlineacion.creadoEn,
+            jeId: jugadorEquipo.id,
+            jugNombreCompleto: jugador.nombreCompleto, jugNombre: jugador.nombre, jugPosicion: jugador.posicion,
+          })
+          .from(snapshotAlineacion)
+          .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, snapshotAlineacion.jugadorEquipoId))
+          .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+          .where(and(eq(snapshotAlineacion.jornadaId, j.id), eq(snapshotAlineacion.miembroLigaId, miembro.id))),
         db.query.puntuacionJornada.findFirst({
           where: and(eq(puntuacionJornada.jornadaId, j.id), eq(puntuacionJornada.miembroLigaId, miembro.id)),
         }),
       ])
 
-      const jugadoresSnap = snaps
-        .map(s => {
-          const stats  = s.jugadorEquipo.estadisticas[0] ?? null
-          const puntos = stats ? (s.esCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
+      const jeIds = snapsRaw.map(r => r.jeId)
+      const statsRows = jeIds.length > 0
+        ? await db.select().from(estadisticaJornada)
+            .where(and(eq(estadisticaJornada.jornadaId, j.id), inArray(estadisticaJornada.jugadorEquipoId, jeIds)))
+        : []
+      const statsMap = new Map(statsRows.map(s => [s.jugadorEquipoId, s]))
+
+      const jugadoresSnap = snapsRaw
+        .map(r => {
+          const stats  = statsMap.get(r.jeId) ?? null
+          const puntos = stats ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
           return {
-            jugador:     { nombreCompleto: s.jugadorEquipo.jugador.nombreCompleto, posicion: s.jugadorEquipo.jugador.posicion },
-            esCapitan:   s.esCapitan,
+            jugador:     { nombreCompleto: r.jugNombreCompleto, nombre: r.jugNombre, posicion: r.jugPosicion },
+            esCapitan:   r.snapEsCapitan,
             estadistica: stats ? { convocado: stats.convocado, titular: stats.titular, minutosJugados: stats.minutosJugados, goles: stats.goles, tarjetasAmarillas: stats.tarjetasAmarillas, tarjetaRoja: stats.tarjetaRoja, resultado: stats.resultado, desglose: stats.desglose } : null,
             puntos,
           }
@@ -357,6 +465,82 @@ export const getHistorialAlineaciones = async (req: AuthRequest, res: Response) 
     res.json(historial)
   } catch {
     res.status(500).json({ error: 'Error al obtener historial' })
+  }
+}
+
+// ─── HISTORIAL DE ALINEACIONES DE CUALQUIER MIEMBRO ──
+
+export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
+  const { ligaId, miembroId } = req.params as { ligaId: string; miembroId: string }
+  const usuarioId = req.usuarioId!
+
+  try {
+    // Verificar que el solicitante es miembro de la liga
+    const solicitante = await db.query.miembroLiga.findFirst({ where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)) })
+    if (!solicitante) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
+
+    const miembro = await db.query.miembroLiga.findFirst({ where: and(eq(miembroLiga.id, miembroId), eq(miembroLiga.ligaId, ligaId)) })
+    if (!miembro) { res.status(404).json({ error: 'Miembro no encontrado' }); return }
+
+    const jornadaIds = await db.selectDistinct({ jornadaId: snapshotAlineacion.jornadaId })
+      .from(snapshotAlineacion).where(eq(snapshotAlineacion.miembroLigaId, miembroId))
+    if (jornadaIds.length === 0) { res.json([]); return }
+
+    const POS_ORDER = ['PORTERO', 'DEFENSA', 'CENTROCAMPISTA', 'DELANTERO', 'UNKNOWN']
+    const jornadas  = await db.query.jornada.findMany({
+      where:   inArray(jornada.id, jornadaIds.map(r => r.jornadaId)),
+      orderBy: desc(jornada.numJornada),
+    })
+
+    const historial = await Promise.all(jornadas.map(async j => {
+      const [snapsRaw, puntuacion] = await Promise.all([
+        db.select({
+            jeId: jugadorEquipo.id,
+            jugId: jugador.id,
+            jugNombreCompleto: jugador.nombreCompleto, jugNombre: jugador.nombre, jugPosicion: jugador.posicion,
+            equipoNombre: equipo.nombre,
+            snapEsCapitan: snapshotAlineacion.esCapitan,
+          })
+          .from(snapshotAlineacion)
+          .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, snapshotAlineacion.jugadorEquipoId))
+          .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+          .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+          .where(and(eq(snapshotAlineacion.jornadaId, j.id), eq(snapshotAlineacion.miembroLigaId, miembroId))),
+        db.query.puntuacionJornada.findFirst({
+          where: and(eq(puntuacionJornada.jornadaId, j.id), eq(puntuacionJornada.miembroLigaId, miembroId)),
+        }),
+      ])
+
+      const jeIds = snapsRaw.map(r => r.jeId)
+      const statsRows = jeIds.length > 0
+        ? await db.select().from(estadisticaJornada)
+            .where(and(eq(estadisticaJornada.jornadaId, j.id), inArray(estadisticaJornada.jugadorEquipoId, jeIds)))
+        : []
+      const statsMap = new Map(statsRows.map(s => [s.jugadorEquipoId, s]))
+
+      const jugadoresSnap = snapsRaw
+        .map(r => {
+          const stats  = statsMap.get(r.jeId) ?? null
+          const puntos = stats ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
+          return {
+            jugadorId:    r.jugId,
+            jugador:      { nombre: r.jugNombre, nombreCompleto: r.jugNombreCompleto, posicion: r.jugPosicion },
+            equipo:       r.equipoNombre,
+            esCapitan:    r.snapEsCapitan,
+            puntos,
+          }
+        })
+        .sort((a, b) => POS_ORDER.indexOf(a.jugador.posicion) - POS_ORDER.indexOf(b.jugador.posicion))
+
+      return {
+        jornada:     { id: j.id, numJornada: j.numJornada, fechaCierre: j.fechaCierre },
+        totalPuntos: puntuacion?.puntos ?? null,
+        jugadores:   jugadoresSnap,
+      }
+    }))
+    res.json(historial)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener historial del miembro' })
   }
 }
 
@@ -395,8 +579,12 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
     const miembro = await db.query.miembroLiga.findFirst({ where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)) })
     if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
 
-    const miEquipo = await db.query.plantillaFantasy.findMany({ where: eq(plantillaFantasy.miembroLigaId, miembro.id), with: { jugador: true } })
-    const misIds   = new Set(miEquipo.map(pf => pf.jugadorId))
+    const miEquipo = await db
+      .select({ pfJugadorId: plantillaFantasy.jugadorId, jPosicion: jugador.posicion })
+      .from(plantillaFantasy)
+      .innerJoin(jugador, eq(jugador.id, plantillaFantasy.jugadorId))
+      .where(eq(plantillaFantasy.miembroLigaId, miembro.id))
+    const misIds = new Set(miEquipo.map(pf => pf.pfJugadorId))
     for (const id of jugadorIds) {
       if (!misIds.has(id)) { res.status(400).json({ error: 'Uno o más jugadores no pertenecen a tu equipo' }); return }
     }
@@ -404,7 +592,7 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
     const slots  = SLOTS_FORMACION[formacion]
     const conteo: Record<string, number> = {}
     for (const id of jugadorIds) {
-      const pos = miEquipo.find(pf => pf.jugadorId === id)!.jugador.posicion
+      const pos = miEquipo.find(pf => pf.pfJugadorId === id)!.jPosicion
       conteo[pos] = (conteo[pos] ?? 0) + 1
     }
     for (const [pos, max] of Object.entries(slots)) {

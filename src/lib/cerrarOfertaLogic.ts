@@ -4,15 +4,16 @@ import { db } from '../db'
 import { ofertaMercado, puja, plantillaFantasy, miembroLiga, transferencia } from '../db/schema'
 
 export async function cerrarOfertaLogic(ofertaId: string) {
-  const oferta = await db.query.ofertaMercado.findFirst({
-    where: eq(ofertaMercado.id, ofertaId),
-    with: { pujas: { orderBy: desc(puja.cantidad), limit: 1 } },
-  })
+  const [oferta] = await db.select().from(ofertaMercado).where(eq(ofertaMercado.id, ofertaId)).limit(1)
 
   if (!oferta || oferta.estado !== 'ACTIVA') return null
 
+  const [mejorPuja] = await db.select().from(puja)
+    .where(eq(puja.ofertaMercadoId, ofertaId))
+    .orderBy(desc(puja.cantidad))
+    .limit(1)
+
   return db.transaction(async tx => {
-    const mejorPuja = oferta.pujas[0]
 
     if (!mejorPuja) {
       await tx.update(ofertaMercado).set({ estado: 'CANCELADA' }).where(eq(ofertaMercado.id, ofertaId))

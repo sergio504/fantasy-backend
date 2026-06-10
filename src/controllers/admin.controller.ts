@@ -6,7 +6,7 @@ import { db } from '../db'
 import {
   usuario, liga, jugador, jugadorEquipo, equipo, estadisticaJornada,
   configPuntuacion, historialAdmin, ofertaMercado, puja, miembroLiga,
-  snapshotAlineacion, puntuacionJornada,
+  snapshotAlineacion, puntuacionJornada, jornada,
   Posicion, AccionPuntuacion, ResultadoPartido,
 } from '../db/schema'
 import { registrarAccion as registrar } from '../lib/registrarAccion'
@@ -15,13 +15,24 @@ import { registrarAccion as registrar } from '../lib/registrarAccion'
 
 export const getJugadoresAdmin = async (_req: AuthRequest, res: Response) => {
   try {
-    const jugadores = await db.query.jugador.findMany({
-      orderBy: asc(jugador.nombreCompleto),
-      with: {
-        historialEquipos: { where: eq(jugadorEquipo.activo, true), limit: 1, with: { equipo: true } },
-      },
-    })
-    res.json(jugadores)
+    const jugadores = await db.select().from(jugador).orderBy(asc(jugador.nombreCompleto))
+    const jeRows = jugadores.length > 0
+      ? await db.select({
+            jeJugadorId: jugadorEquipo.jugadorId, jeId: jugadorEquipo.id,
+            jeEquipoId: jugadorEquipo.equipoId, jeDesde: jugadorEquipo.desde,
+            jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+            eId: equipo.id, eNombre: equipo.nombre, eDivision: equipo.division, eCreadoEn: equipo.creadoEn,
+          })
+          .from(jugadorEquipo)
+          .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+          .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, jugadores.map(j => j.id))))
+      : []
+    const histMap = new Map(jeRows.map(r => [r.jeJugadorId, {
+      id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
+      desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
+      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+    }]))
+    res.json(jugadores.map(j => ({ ...j, historialEquipos: histMap.has(j.id) ? [histMap.get(j.id)!] : [] })))
   } catch {
     res.status(500).json({ error: 'Error al obtener jugadores' })
   }
@@ -80,7 +91,24 @@ export const crearFichaje = async (req: AuthRequest, res: Response) => {
       .where(and(eq(jugadorEquipo.jugadorId, jugadorId), eq(jugadorEquipo.activo, true)))
     const id = randomUUID()
     await db.insert(jugadorEquipo).values({ id, jugadorId, equipoId, desde: desde ? new Date(desde) : new Date(), activo: true, creadoEn: new Date() })
-    const fichaje = await db.query.jugadorEquipo.findFirst({ where: eq(jugadorEquipo.id, id), with: { jugador: true, equipo: true } })
+    const fRows = await db.select({
+      jeId: jugadorEquipo.id, jeJugadorId: jugadorEquipo.jugadorId, jeEquipoId: jugadorEquipo.equipoId,
+      jeDesde: jugadorEquipo.desde, jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+      jId: jugador.id, jNombreCompleto: jugador.nombreCompleto, jNombre: jugador.nombre,
+      jDorsal: jugador.dorsal, jEdad: jugador.edad, jPosicion: jugador.posicion,
+      jValor: jugador.valor, jCreadoEn: jugador.creadoEn,
+      eId: equipo.id, eNombre: equipo.nombre, eDivision: equipo.division, eCreadoEn: equipo.creadoEn,
+    }).from(jugadorEquipo)
+      .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+      .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+      .where(eq(jugadorEquipo.id, id)).limit(1)
+    const r = fRows[0]
+    const fichaje = r ? {
+      id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
+      desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
+      jugador: { id: r.jId, nombreCompleto: r.jNombreCompleto, nombre: r.jNombre, dorsal: r.jDorsal, edad: r.jEdad, posicion: r.jPosicion, valor: r.jValor, creadoEn: r.jCreadoEn },
+      equipo:  { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+    } : null
     await registrar(req.usuarioId!, 'CREAR_FICHAJE', 'JugadorEquipo', id, fichaje!)
     res.status(201).json(fichaje)
   } catch {
@@ -120,11 +148,30 @@ export const getEquipos = async (_req: AuthRequest, res: Response) => {
 export const getEstadisticasJornada = async (req: AuthRequest, res: Response) => {
   const jornadaId = req.params.jornadaId as string
   try {
-    const stats = await db.query.estadisticaJornada.findMany({
-      where: eq(estadisticaJornada.jornadaId, jornadaId),
-      with:  { jugadorEquipo: { with: { jugador: true, equipo: true } } },
-    })
-    stats.sort((a, b) => a.jugadorEquipo.jugador.nombreCompleto.localeCompare(b.jugadorEquipo.jugador.nombreCompleto))
+    const statsRaw = await db.select().from(estadisticaJornada).where(eq(estadisticaJornada.jornadaId, jornadaId))
+    const jeIds = statsRaw.map(s => s.jugadorEquipoId)
+    const jeRows = jeIds.length > 0
+      ? await db.select({
+            jeId: jugadorEquipo.id, jeJugadorId: jugadorEquipo.jugadorId, jeEquipoId: jugadorEquipo.equipoId,
+            jeDesde: jugadorEquipo.desde, jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+            jId: jugador.id, jNombreCompleto: jugador.nombreCompleto, jNombre: jugador.nombre,
+            jDorsal: jugador.dorsal, jEdad: jugador.edad, jPosicion: jugador.posicion, jValor: jugador.valor, jCreadoEn: jugador.creadoEn,
+            eId: equipo.id, eNombre: equipo.nombre, eDivision: equipo.division, eCreadoEn: equipo.creadoEn,
+          }).from(jugadorEquipo)
+          .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+          .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+          .where(inArray(jugadorEquipo.id, jeIds))
+      : []
+    const jeMap = new Map(jeRows.map(r => [r.jeId, r]))
+    const stats = statsRaw
+      .map(s => {
+        const je = jeMap.get(s.jugadorEquipoId)!
+        return { ...s, jugadorEquipo: { id: je.jeId, jugadorId: je.jeJugadorId, equipoId: je.jeEquipoId, desde: je.jeDesde, hasta: je.jeHasta, activo: je.jeActivo, creadoEn: je.jeCreadoEn,
+          jugador: { id: je.jId, nombreCompleto: je.jNombreCompleto, nombre: je.jNombre, dorsal: je.jDorsal, edad: je.jEdad, posicion: je.jPosicion, valor: je.jValor, creadoEn: je.jCreadoEn },
+          equipo:  { id: je.eId, nombre: je.eNombre, division: je.eDivision, creadoEn: je.eCreadoEn },
+        }}
+      })
+      .sort((a, b) => a.jugadorEquipo.jugador.nombreCompleto.localeCompare(b.jugadorEquipo.jugador.nombreCompleto))
     res.json(stats)
   } catch {
     res.status(500).json({ error: 'Error al obtener estadísticas' })
@@ -158,11 +205,15 @@ export const editarEstadistica = async (req: AuthRequest, res: Response) => {
   const { convocado, titular, minutosJugados, goles, tarjetasAmarillas, tarjetaRoja, resultado } = req.body
 
   try {
-    const antes = await db.query.estadisticaJornada.findFirst({
-      where: eq(estadisticaJornada.id, id),
-      with:  { jugadorEquipo: { with: { jugador: true } }, jornada: true },
-    })
-    if (!antes) { res.status(404).json({ error: 'Estadística no encontrada' }); return }
+    const [antesRaw] = await db.select().from(estadisticaJornada).where(eq(estadisticaJornada.id, id)).limit(1)
+    if (!antesRaw) { res.status(404).json({ error: 'Estadística no encontrada' }); return }
+    const [[jeRow], [jornadaRow]] = await Promise.all([
+      db.select({ jPosicion: jugador.posicion }).from(jugadorEquipo)
+        .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+        .where(eq(jugadorEquipo.id, antesRaw.jugadorEquipoId)).limit(1),
+      db.select().from(jornada).where(eq(jornada.id, antesRaw.jornadaId)).limit(1),
+    ])
+    const antes = { ...antesRaw, jugadorEquipo: { jugador: { posicion: jeRow.jPosicion } }, jornada: jornadaRow }
 
     const nuevosDatos = {
       convocado:         convocado         ?? antes.convocado,
@@ -352,12 +403,13 @@ export const getDashboard = async (_req: AuthRequest, res: Response) => {
 
 export const getHistorial = async (_req: AuthRequest, res: Response) => {
   try {
-    const historial = await db.query.historialAdmin.findMany({
-      orderBy: desc(historialAdmin.creadoEn),
-      limit:   500,
-      with:    { admin: { columns: { username: true } } },
-    })
-    res.json(historial)
+    const historialRaw = await db.select().from(historialAdmin).orderBy(desc(historialAdmin.creadoEn)).limit(500)
+    const adminIds = [...new Set(historialRaw.map(h => h.adminId))]
+    const admins = adminIds.length > 0
+      ? await db.select({ id: usuario.id, username: usuario.username }).from(usuario).where(inArray(usuario.id, adminIds))
+      : []
+    const adminMap = new Map(admins.map(a => [a.id, a]))
+    res.json(historialRaw.map(h => ({ ...h, admin: adminMap.has(h.adminId) ? { username: adminMap.get(h.adminId)!.username } : null })))
   } catch {
     res.status(500).json({ error: 'Error al obtener historial' })
   }

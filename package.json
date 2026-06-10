@@ -14,7 +14,8 @@
     "db:migrate": "drizzle-kit migrate",
     "seed:config": "ts-node -P tsconfig.scripts.json prisma/seed-config-puntuacion.ts",
     "seed:demo": "ts-node -P tsconfig.scripts.json prisma/seed-demo.ts",
-    "import:jugadores": "ts-node -P tsconfig.scripts.json prisma/importar-jugadores.ts"
+    "import:jugadores": "ts-node -P tsconfig.scripts.json prisma/importar-jugadores.ts",
+    "seed": "ts-node -P tsconfig.scripts.json prisma/seed-drizzle.ts"
   },
   "keywords": [],
   "author": "",

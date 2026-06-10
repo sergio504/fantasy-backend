@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { eq, and, isNull, gte, lte, notInArray, count } from 'drizzle-orm'
+import { eq, and, isNull, gte, lte, notInArray, count, inArray } from 'drizzle-orm'
 import { db } from '../db'
 import { liga, miembroLiga, ofertaMercado, plantillaFantasy, jugador, jugadorEquipo, equipo } from '../db/schema'
 import { cerrarOfertaLogic } from '../lib/cerrarOfertaLogic'
@@ -13,8 +13,11 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export async function ponerJugadoresEnMercado(): Promise<{ ligaId: string; nombre: string; añadidos: number }[]> {
-  const ligas = await db.query.liga.findMany({ with: { miembros: { limit: 1 } } })
-  const ligasConMiembros = ligas.filter(l => l.miembros.length > 0)
+  const ligaIdsRaw = await db.selectDistinct({ id: miembroLiga.ligaId }).from(miembroLiga)
+  const ligaIds = ligaIdsRaw.map(r => r.id)
+  const ligasConMiembros = ligaIds.length > 0
+    ? await db.select().from(liga).where(inArray(liga.id, ligaIds))
+    : []
   const resumen: { ligaId: string; nombre: string; añadidos: number }[] = []
 
   for (const l of ligasConMiembros) {

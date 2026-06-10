@@ -5,7 +5,7 @@ import { eq, and, or, asc, desc, gte, lte, isNull, count, inArray, sql } from 'd
 import { db } from '../db'
 import {
   jornada, estadisticaJornada, snapshotAlineacion, puntuacionJornada,
-  miembroLiga, liga, jugadorEquipo, configPuntuacion, usuario,
+  miembroLiga, liga, jugador, jugadorEquipo, equipo, titularLiga, configPuntuacion, usuario,
   Division, Posicion, AccionPuntuacion, ResultadoPartido,
 } from '../db/schema'
 import { registrarAccion } from '../lib/registrarAccion'
@@ -100,10 +100,20 @@ export const simularJornada = async (req: AuthRequest, res: Response) => {
           or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaCierre)))
     )
 
-    const jugadoresEquipo = await db.query.jugadorEquipo.findMany({
-      where: and(eq(jugadorEquipo.activo, true)),
-      with:  { jugador: true, equipo: true },
-    })
+    const jeRaw = await db.select({
+      jeId: jugadorEquipo.id, jeJugadorId: jugadorEquipo.jugadorId, jeEquipoId: jugadorEquipo.equipoId,
+      jeDesde: jugadorEquipo.desde, jeHasta: jugadorEquipo.hasta, jeActivo: jugadorEquipo.activo, jeCreadoEn: jugadorEquipo.creadoEn,
+      jPosicion: jugador.posicion,
+      eDivision: equipo.division,
+    }).from(jugadorEquipo)
+      .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+      .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
+      .where(eq(jugadorEquipo.activo, true))
+    const jugadoresEquipo = jeRaw.map(r => ({
+      id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
+      desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
+      jugador: { posicion: r.jPosicion }, equipo: { division: r.eDivision },
+    }))
     const jugadoresEquipoDivision = jugadoresEquipo.filter(je => je.equipo.division === j.division)
 
     const resultadosPorEquipo = new Map<string, ResultadoPartido>()
@@ -147,28 +157,28 @@ export const generarSnapshot = async (req: AuthRequest, res: Response) => {
     const ligaIds = ligas.map(l => l.id)
     if (ligaIds.length === 0) { res.json({ mensaje: 'No hay ligas en esta división', jornadaId }); return }
 
-    const miembros = await db.query.miembroLiga.findMany({
-      where: inArray(miembroLiga.ligaId, ligaIds),
-      with:  {
-        titulares: {
-          with: {
-            jugador: {
-              with: { historialEquipos: { where: eq(jugadorEquipo.activo, true), limit: 1 } },
-            },
-          },
-        },
-      },
-    })
+    const miembros = await db.select().from(miembroLiga).where(inArray(miembroLiga.ligaId, ligaIds))
+    const miembroIds = miembros.map(m => m.id)
 
+    const titularesRaw = miembroIds.length > 0
+      ? await db
+          .select({ miembroLigaId: titularLiga.miembroLigaId, jugadorId: titularLiga.jugadorId, jeId: jugadorEquipo.id })
+          .from(titularLiga)
+          .innerJoin(jugadorEquipo, and(eq(jugadorEquipo.jugadorId, titularLiga.jugadorId), eq(jugadorEquipo.activo, true)))
+          .where(inArray(titularLiga.miembroLigaId, miembroIds))
+      : []
+
+    const miembroMap = new Map(miembros.map(m => [m.id, m]))
     const snapshots: { id: string; jornadaId: string; miembroLigaId: string; jugadorEquipoId: string; esCapitan: boolean; creadoEn: Date }[] = []
+    const seen = new Set<string>()
 
-    for (const miembro of miembros) {
-      if (miembro.titulares.length === 0) continue
-      for (const titular of miembro.titulares) {
-        const je = titular.jugador.historialEquipos[0]
-        if (!je) continue
-        snapshots.push({ id: randomUUID(), jornadaId, miembroLigaId: miembro.id, jugadorEquipoId: je.id, esCapitan: miembro.capitanId === titular.jugadorId, creadoEn: new Date() })
-      }
+    for (const r of titularesRaw) {
+      const key = `${r.miembroLigaId}:${r.jugadorId}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      const miembro = miembroMap.get(r.miembroLigaId)
+      if (!miembro) continue
+      snapshots.push({ id: randomUUID(), jornadaId, miembroLigaId: r.miembroLigaId, jugadorEquipoId: r.jeId, esCapitan: miembro.capitanId === r.jugadorId, creadoEn: new Date() })
     }
 
     if (snapshots.length > 0) await db.insert(snapshotAlineacion).ignore().values(snapshots)
@@ -259,22 +269,29 @@ export const getEstadisticasJornada = async (req: AuthRequest, res: Response) =>
     const miembro = await db.query.miembroLiga.findFirst({ where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)) })
     if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
 
-    const snapshots = await db.query.snapshotAlineacion.findMany({
-      where: and(eq(snapshotAlineacion.jornadaId, jornadaId), eq(snapshotAlineacion.miembroLigaId, miembro.id)),
-      with:  {
-        jugadorEquipo: {
-          with: {
-            jugador: true,
-            estadisticas: { where: eq(estadisticaJornada.jornadaId, jornadaId) },
-          },
-        },
-      },
-    })
+    const snapsRaw = await db
+      .select({
+        snapId: snapshotAlineacion.id, snapMiembroLigaId: snapshotAlineacion.miembroLigaId,
+        snapJugadorEquipoId: snapshotAlineacion.jugadorEquipoId, snapEsCapitan: snapshotAlineacion.esCapitan,
+        jeId: jugadorEquipo.id,
+        jugNombreCompleto: jugador.nombreCompleto, jugPosicion: jugador.posicion,
+      })
+      .from(snapshotAlineacion)
+      .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, snapshotAlineacion.jugadorEquipoId))
+      .innerJoin(jugador, eq(jugador.id, jugadorEquipo.jugadorId))
+      .where(and(eq(snapshotAlineacion.jornadaId, jornadaId), eq(snapshotAlineacion.miembroLigaId, miembro.id)))
 
-    res.json(snapshots.map(s => {
-      const stats  = s.jugadorEquipo.estadisticas[0] ?? null
-      const puntos = stats ? (s.esCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
-      return { jugador: { nombreCompleto: s.jugadorEquipo.jugador.nombreCompleto, posicion: s.jugadorEquipo.jugador.posicion }, esCapitan: s.esCapitan, estadistica: stats, puntos }
+    const jeIds = snapsRaw.map(r => r.jeId)
+    const statsRows = jeIds.length > 0
+      ? await db.select().from(estadisticaJornada)
+          .where(and(eq(estadisticaJornada.jornadaId, jornadaId), inArray(estadisticaJornada.jugadorEquipoId, jeIds)))
+      : []
+    const statsMap = new Map(statsRows.map(s => [s.jugadorEquipoId, s]))
+
+    res.json(snapsRaw.map(r => {
+      const stats  = statsMap.get(r.jeId) ?? null
+      const puntos = stats ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
+      return { jugador: { nombreCompleto: r.jugNombreCompleto, posicion: r.jugPosicion }, esCapitan: r.snapEsCapitan, estadistica: stats, puntos }
     }))
   } catch {
     res.status(500).json({ error: 'Error al obtener estadísticas' })
