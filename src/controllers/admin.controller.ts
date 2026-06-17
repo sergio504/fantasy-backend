@@ -5,11 +5,12 @@ import { eq, and, or, asc, desc, gte, isNull, lte, inArray, count, sql } from 'd
 import { db } from '../db'
 import {
   usuario, liga, jugador, jugadorEquipo, equipo, estadisticaJornada,
-  configPuntuacion, historialAdmin, ofertaMercado, puja, miembroLiga,
-  snapshotAlineacion, puntuacionJornada, jornada,
+  configPuntuacion, configEconomia, configRevalorizacion, historialAdmin, historialConfig, ofertaMercado, puja, miembroLiga,
+  snapshotAlineacion, puntuacionJornada, jornada, aliasEquipo, aliasJugador,
   Posicion, AccionPuntuacion, ResultadoPartido,
 } from '../db/schema'
 import { registrarAccion as registrar } from '../lib/registrarAccion'
+import { registrarCambioConfig } from '../lib/historial'
 
 // ─── JUGADORES ─────────────────────────────────────
 
@@ -179,7 +180,14 @@ export const getEstadisticasJornada = async (req: AuthRequest, res: Response) =>
 }
 
 function recalcularPuntos(
-  stats: { convocado: boolean; titular: boolean; minutosJugados: number; goles: number; tarjetasAmarillas: number; tarjetaRoja: boolean; resultado: ResultadoPartido },
+  stats: {
+    convocado: boolean; titular: boolean; minutosJugados: number
+    goles: number; golesDePenalti: number; golEnPropia: number
+    golesAFavor: number; golesEncajados: number
+    diferenciaGoles: number
+    tarjetasAmarillas: number; tarjetaRoja: boolean
+    resultado: ResultadoPartido
+  },
   posicion: Posicion,
   config: { posicion: Posicion | null; accion: AccionPuntuacion; puntos: number }[]
 ) {
@@ -189,14 +197,24 @@ function recalcularPuntos(
   }
   const d: Record<string, unknown> = {}
   let total = 0
-  if (stats.convocado)          { const p = get('CONVOCADO');        d.convocado = p; total += p }
-  if (stats.titular)            { const p = get('TITULAR');          d.titular   = p; total += p }
-  if (stats.minutosJugados > 60){ const p = get('MINUTOS_60');       d.minutos60 = p; total += p }
-  if (stats.goles > 0)          { const u = get('GOL'); const t = u * stats.goles; d.goles = { cantidad: stats.goles, puntosUnitarios: u, total: t }; total += t }
-  if (stats.tarjetasAmarillas > 0) { const u = get('TARJETA_AMARILLA'); const t = u * stats.tarjetasAmarillas; d.tarjetasAmarillas = { cantidad: stats.tarjetasAmarillas, puntosUnitarios: u, total: t }; total += t }
-  if (stats.tarjetaRoja)        { const p = get('TARJETA_ROJA');     d.tarjetaRoja = p; total += p }
+  const golesNormales = stats.goles - stats.golesDePenalti
+
+  if (stats.convocado)                  { const p = get('CONVOCADO');       d.convocado     = p; total += p }
+  if (stats.minutosJugados > 0)         { const p = get('JUEGA');           d.juega         = p; total += p }
+  if (stats.titular)                    { const p = get('TITULAR');         d.titular       = p; total += p }
+  if (stats.minutosJugados > 60)        { const p = get('MINUTOS_60');      d.minutos60     = p; total += p }
+  if (golesNormales > 0)                { const u = get('GOL');             const t = u * golesNormales;        d.goles          = { cantidad: golesNormales,        puntosUnitarios: u, total: t }; total += t }
+  if (stats.golesDePenalti > 0)         { const u = get('GOL_PENALTY');     const t = u * stats.golesDePenalti; d.golesPenalty   = { cantidad: stats.golesDePenalti, puntosUnitarios: u, total: t }; total += t }
+  if (stats.golEnPropia > 0)            { const u = get('GOL_PROPIA');      const t = u * stats.golEnPropia;    d.golEnPropia    = { cantidad: stats.golEnPropia,    puntosUnitarios: u, total: t }; total += t }
+  if (stats.golesAFavor > 0)            { const u = get('GOL_A_FAVOR');     const t = u * stats.golesAFavor;    d.golesAFavor    = { cantidad: stats.golesAFavor,    puntosUnitarios: u, total: t }; total += t }
+  if (stats.golesEncajados > 0)         { const u = get('GOL_ENCAJADO');    const t = u * stats.golesEncajados; d.golesEncajados = { cantidad: stats.golesEncajados, puntosUnitarios: u, total: t }; total += t }
   const accionRes: AccionPuntuacion = stats.resultado === 'VICTORIA' ? 'VICTORIA' : stats.resultado === 'EMPATE' ? 'EMPATE' : 'DERROTA'
   const pRes = get(accionRes); d.resultado = { tipo: stats.resultado, puntos: pRes }; total += pRes
+  if (stats.diferenciaGoles > 3)        { const p = get('GOLEADA_FAVOR');   d.goleadaFavor   = p; total += p }
+  if (stats.diferenciaGoles < -3)       { const p = get('GOLEADA_CONTRA');  d.goleadaContra  = p; total += p }
+  if (stats.tarjetasAmarillas >= 2)     { const p = get('DOBLE_AMARILLA');  d.dobleAmarilla  = p; total += p }
+  else if (stats.tarjetasAmarillas > 0) { const p = get('TARJETA_AMARILLA');d.tarjetaAmarilla= p; total += p }
+  if (stats.tarjetaRoja)                { const p = get('TARJETA_ROJA');    d.tarjetaRoja    = p; total += p }
   return { total, desglose: d }
 }
 
@@ -220,6 +238,11 @@ export const editarEstadistica = async (req: AuthRequest, res: Response) => {
       titular:           titular           ?? antes.titular,
       minutosJugados:    minutosJugados    ?? antes.minutosJugados,
       goles:             goles             ?? antes.goles,
+      golesDePenalti:    antes.golesDePenalti,
+      golEnPropia:       antes.golEnPropia,
+      golesAFavor:       antes.golesAFavor,
+      golesEncajados:    antes.golesEncajados,
+      diferenciaGoles:   antes.diferenciaGoles,
       tarjetasAmarillas: tarjetasAmarillas ?? antes.tarjetasAmarillas,
       tarjetaRoja:       tarjetaRoja       ?? antes.tarjetaRoja,
       resultado:         resultado         ?? antes.resultado,
@@ -288,9 +311,119 @@ export const actualizarConfigPuntuacion = async (req: AuthRequest, res: Response
     const [nueva] = await db.select().from(configPuntuacion).where(eq(configPuntuacion.id, nuevaId)).limit(1)
 
     await registrar(req.usuarioId!, 'ACTUALIZAR_CONFIG', 'ConfigPuntuacion', nuevaId, nueva as object, actual as object)
+    await registrarCambioConfig({
+      tipo: 'PUNTUACION',
+      campo: `${actual.accion}${actual.posicion ? ` · ${actual.posicion}` : ''}`,
+      valorAnterior: actual.puntos,
+      valorNuevo: puntos,
+      adminId: req.usuarioId!,
+    })
     res.json(nueva)
   } catch {
     res.status(500).json({ error: 'Error al actualizar configuración' })
+  }
+}
+
+// ─── CONFIG ECONOMÍA ───────────────────────────────
+
+const DEFAULTS_ECONOMIA: Record<string, { valor: number; descripcion: string }> = {
+  INGRESO_FIJO:      { valor: 500_000,   descripcion: 'Ingreso fijo por jornada para todos los equipos' },
+  INGRESO_POR_PUNTO: { valor:  50_000,   descripcion: 'Ingreso adicional por cada punto conseguido' },
+  BONUS_P1:          { valor: 3_000_000, descripcion: 'Bonus por quedar 1º en la liga esta jornada' },
+  BONUS_P2:          { valor: 2_000_000, descripcion: 'Bonus por quedar 2º en la liga esta jornada' },
+  BONUS_P3:          { valor: 1_500_000, descripcion: 'Bonus por quedar 3º en la liga esta jornada' },
+  BONUS_P4:          { valor: 1_000_000, descripcion: 'Bonus por quedar 4º en la liga esta jornada' },
+  BONUS_P5:          { valor:   500_000, descripcion: 'Bonus por quedar 5º en la liga esta jornada' },
+}
+
+export const getConfigEconomia = async (_req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db.select().from(configEconomia)
+    const mapa = new Map(rows.map(r => [r.clave, r]))
+    const resultado = Object.entries(DEFAULTS_ECONOMIA).map(([clave, def]) => {
+      const row = mapa.get(clave)
+      return { clave, valor: row?.valor ?? def.valor, descripcion: row?.descripcion ?? def.descripcion, id: row?.id ?? null }
+    })
+    res.json(resultado)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener config economía' })
+  }
+}
+
+export const actualizarConfigEconomia = async (req: AuthRequest, res: Response) => {
+  const clave = req.params.clave as string
+  const { valor } = req.body
+  if (valor === undefined || isNaN(Number(valor))) { res.status(400).json({ error: 'valor numérico obligatorio' }); return }
+  if (!DEFAULTS_ECONOMIA[clave]) { res.status(404).json({ error: 'Clave no reconocida' }); return }
+
+  try {
+    const [existing] = await db.select().from(configEconomia).where(eq(configEconomia.clave, clave)).limit(1)
+    const valorAnterior = existing?.valor ?? DEFAULTS_ECONOMIA[clave].valor
+    if (existing) {
+      await db.update(configEconomia).set({ valor: Number(valor) }).where(eq(configEconomia.clave, clave))
+    } else {
+      await db.insert(configEconomia).values({ id: randomUUID(), clave, valor: Number(valor), descripcion: DEFAULTS_ECONOMIA[clave].descripcion })
+    }
+    await registrarCambioConfig({
+      tipo: 'ECONOMIA',
+      campo: `${clave} · ${DEFAULTS_ECONOMIA[clave].descripcion}`,
+      valorAnterior,
+      valorNuevo: Number(valor),
+      adminId: req.usuarioId!,
+    })
+    res.json({ clave, valor: Number(valor) })
+  } catch {
+    res.status(500).json({ error: 'Error al actualizar config economía' })
+  }
+}
+
+// ─── CONFIG REVALORIZACIÓN ─────────────────────────
+
+const DEFAULTS_REVALORIZACION = [
+  { orden: 1, puntosHasta: 0,    porcentaje: -8, descripcion: '0 puntos' },
+  { orden: 2, puntosHasta: 4,    porcentaje: -5, descripcion: '1-4 puntos' },
+  { orden: 3, puntosHasta: 8,    porcentaje: -2, descripcion: '5-8 puntos' },
+  { orden: 4, puntosHasta: 12,   porcentaje:  3, descripcion: '9-12 puntos' },
+  { orden: 5, puntosHasta: 17,   porcentaje:  7, descripcion: '13-17 puntos' },
+  { orden: 6, puntosHasta: null, porcentaje: 12, descripcion: '18+ puntos' },
+]
+
+export const getConfigRevalorizacion = async (_req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db.select().from(configRevalorizacion).orderBy(asc(configRevalorizacion.orden))
+    if (rows.length === 0) {
+      res.json(DEFAULTS_REVALORIZACION.map(d => ({ ...d, id: null })))
+      return
+    }
+    res.json(rows)
+  } catch {
+    // Tabla no creada aún: devolver defaults para que el panel sea visible
+    res.json(DEFAULTS_REVALORIZACION.map(d => ({ ...d, id: null })))
+  }
+}
+
+export const actualizarConfigRevalorizacion = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string
+  const { porcentaje } = req.body
+  if (porcentaje === undefined || isNaN(Number(porcentaje))) {
+    res.status(400).json({ error: 'porcentaje numérico obligatorio' }); return
+  }
+
+  try {
+    const [existing] = await db.select().from(configRevalorizacion).where(eq(configRevalorizacion.id, id)).limit(1)
+    if (!existing) { res.status(404).json({ error: 'Tramo no encontrado' }); return }
+
+    await db.update(configRevalorizacion).set({ porcentaje: Number(porcentaje) }).where(eq(configRevalorizacion.id, id))
+    await registrarCambioConfig({
+      tipo: 'REVALORIZACION',
+      campo: existing.descripcion ?? `Tramo orden ${existing.orden}`,
+      valorAnterior: existing.porcentaje,
+      valorNuevo: Number(porcentaje),
+      adminId: req.usuarioId!,
+    })
+    res.json({ id, porcentaje: Number(porcentaje) })
+  } catch {
+    res.status(500).json({ error: 'Error al actualizar config revalorización' })
   }
 }
 
@@ -396,6 +529,108 @@ export const getDashboard = async (_req: AuthRequest, res: Response) => {
     })
   } catch {
     res.status(500).json({ error: 'Error al obtener dashboard' })
+  }
+}
+
+// ─── ALIASES ───────────────────────────────────────
+
+export const getAliasesEquipos = async (_req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db
+      .select({ alias: aliasEquipo, equipo: { id: equipo.id, nombre: equipo.nombre } })
+      .from(aliasEquipo)
+      .innerJoin(equipo, eq(aliasEquipo.equipoId, equipo.id))
+      .orderBy(asc(equipo.nombre))
+    res.json(rows)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener aliases de equipos' })
+  }
+}
+
+export const crearAliasEquipo = async (req: AuthRequest, res: Response) => {
+  const { equipoId, alias } = req.body
+  if (!equipoId || !alias) { res.status(400).json({ error: 'equipoId y alias son obligatorios' }); return }
+  try {
+    const [eq_] = await db.select().from(equipo).where(eq(equipo.id, equipoId)).limit(1)
+    if (!eq_) { res.status(404).json({ error: 'Equipo no encontrado' }); return }
+    const id = randomUUID()
+    await db.insert(aliasEquipo).values({ id, equipoId, alias })
+    const [nuevo] = await db.select().from(aliasEquipo).where(eq(aliasEquipo.id, id)).limit(1)
+    res.status(201).json(nuevo)
+  } catch (e: any) {
+    if (e?.code === 'ER_DUP_ENTRY') { res.status(409).json({ error: 'Ese alias ya existe' }); return }
+    res.status(500).json({ error: 'Error al crear alias' })
+  }
+}
+
+export const eliminarAliasEquipo = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string
+  try {
+    const [existente] = await db.select().from(aliasEquipo).where(eq(aliasEquipo.id, id)).limit(1)
+    if (!existente) { res.status(404).json({ error: 'Alias no encontrado' }); return }
+    await db.delete(aliasEquipo).where(eq(aliasEquipo.id, id))
+    res.json({ mensaje: 'Alias eliminado' })
+  } catch {
+    res.status(500).json({ error: 'Error al eliminar alias' })
+  }
+}
+
+export const getAliasesJugadores = async (_req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db
+      .select({ alias: aliasJugador, jugador: { id: jugador.id, nombreCompleto: jugador.nombreCompleto } })
+      .from(aliasJugador)
+      .innerJoin(jugador, eq(aliasJugador.jugadorId, jugador.id))
+      .orderBy(asc(jugador.nombreCompleto))
+    res.json(rows)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener aliases de jugadores' })
+  }
+}
+
+export const crearAliasJugador = async (req: AuthRequest, res: Response) => {
+  const { jugadorId, alias } = req.body
+  if (!jugadorId || !alias) { res.status(400).json({ error: 'jugadorId y alias son obligatorios' }); return }
+  try {
+    const [jug] = await db.select().from(jugador).where(eq(jugador.id, jugadorId)).limit(1)
+    if (!jug) { res.status(404).json({ error: 'Jugador no encontrado' }); return }
+    const id = randomUUID()
+    await db.insert(aliasJugador).values({ id, jugadorId, alias })
+    const [nuevo] = await db.select().from(aliasJugador).where(eq(aliasJugador.id, id)).limit(1)
+    res.status(201).json(nuevo)
+  } catch (e: any) {
+    if (e?.code === 'ER_DUP_ENTRY') { res.status(409).json({ error: 'Ese alias ya existe' }); return }
+    res.status(500).json({ error: 'Error al crear alias' })
+  }
+}
+
+export const eliminarAliasJugador = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string
+  try {
+    const [existente] = await db.select().from(aliasJugador).where(eq(aliasJugador.id, id)).limit(1)
+    if (!existente) { res.status(404).json({ error: 'Alias no encontrado' }); return }
+    await db.delete(aliasJugador).where(eq(aliasJugador.id, id))
+    res.json({ mensaje: 'Alias eliminado' })
+  } catch {
+    res.status(500).json({ error: 'Error al eliminar alias' })
+  }
+}
+
+// ─── HISTORIAL CONFIG ──────────────────────────────
+
+export const getHistorialConfig = async (_req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db.select({
+      hc: historialConfig,
+      adminUsername: usuario.username,
+    })
+      .from(historialConfig)
+      .innerJoin(usuario, eq(usuario.id, historialConfig.adminId))
+      .orderBy(desc(historialConfig.creadoEn))
+      .limit(500)
+    res.json(rows.map(r => ({ ...r.hc, adminUsername: r.adminUsername })))
+  } catch {
+    res.status(500).json({ error: 'Error al obtener historial de configuración' })
   }
 }
 

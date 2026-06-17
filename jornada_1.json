@@ -1,0 +1,3660 @@
+{
+  "jornada": "JORNADA 1 - 6/9/2025",
+  "partidos": [
+    {
+      "url": "https://www.lapreferente.com/P3916816C22283-19/2025-2026/cd-derio-vs-cd-san-ignacio",
+      "equipos": [
+        {
+          "equipo": "C.D. DERIO",
+          "jugadores": [
+            {
+              "nombre": "Kevin Ríos",
+              "nombre_completo": "Kevin Ríos Zapata",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Etxeandía",
+              "nombre_completo": "Jon Etxeandía Murua",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Lechosa",
+              "nombre_completo": "Unai Lechosa Alonso",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 54,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Christian",
+              "nombre_completo": "Christian Gabiña Tovar",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 54,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Mayo",
+              "nombre_completo": "Markel Mayo Arce",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Álvaro",
+              "nombre_completo": "Álvaro Fernández Fijo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 82
+            },
+            {
+              "nombre": "Iker Montes",
+              "nombre_completo": "Iker Montes Arroyo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 82,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Barrón",
+              "nombre_completo": "Julen Barrón Artetxe",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 82,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Guipu",
+              "nombre_completo": "Jon Ander Saralegui Odriozola",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 82,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Uztaritz",
+              "nombre_completo": "Uztaritz Expósito Etxegarai",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 63,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Del Campo",
+              "nombre_completo": "Iván Del Campo De la Llosa",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 63,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Egileor",
+              "nombre_completo": "Ander Egileor Zuazo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Ander Calle",
+              "nombre_completo": "Ander Calle Arroyo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "De la Parra",
+              "nombre_completo": "Ander De la Parra Otamendi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Xabier Ugalde",
+              "nombre_completo": "Xabier Ugalde Carral",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 54,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Dani Jiménez",
+              "nombre_completo": "Daniel  Jiménez Gómez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 54,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "red"
+              ]
+            },
+            {
+              "nombre": "Jon",
+              "nombre_completo": "Jon García Támara",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Imaz",
+              "nombre_completo": "Asier Imaz Lasa",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Ander",
+              "nombre_completo": "Ander Gonzalo Lago",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Sendoa",
+              "nombre_completo": "Sendoa Urruticoechea Macias",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        },
+        {
+          "equipo": "C.D. SAN IGNACIO",
+          "jugadores": [
+            {
+              "nombre": "Iván Sanz",
+              "nombre_completo": "Ivan Sanz de Galdeano Sánchez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Urbina",
+              "nombre_completo": "Adrián Ortiz de Urbina Madrazo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Aitor Ruiz",
+              "nombre_completo": "Aitor Ruiz de Mendarozqueta Vivas",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 45,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Joseba",
+              "nombre_completo": "Joseba Eiguren Llona",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 45,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Aitor Iriondo",
+              "nombre_completo": "Aitor Iriondo Valdivielso",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Iñaki Ormazábal",
+              "nombre_completo": "Iñaki Ormazábal García",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Beñat",
+              "nombre_completo": "Beñat Diaz de Mendibil Saez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "red"
+              ]
+            },
+            {
+              "nombre": "Ivan Fernandez",
+              "nombre_completo": "Ivan Fernandez Simon",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 77
+            },
+            {
+              "nombre": "Galceran",
+              "nombre_completo": "Aleix  Galceran Cruz",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 77,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Lizundia",
+              "nombre_completo": "Enaitz Lizundia Nafarrate",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 64
+            },
+            {
+              "nombre": "Faculty",
+              "nombre_completo": "Faculty Osamudiamen Oviawe",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 64,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Julen Castillo",
+              "nombre_completo": "Julen Castillo Sagarduy",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Beñat",
+              "nombre_completo": "Beñat Martínez de Albeniz Mendía",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Testimony",
+              "nombre_completo": "Testimony Onukwuru Onukwuru",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Unax Fernández",
+              "nombre_completo": "Unax Fernández de las Heras Ocio",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Ander",
+              "nombre_completo": "Ander Amezgaray Gómez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Pablo García",
+              "nombre_completo": "Pablo García González",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Xabi",
+              "nombre_completo": "Xabier Elorduy Navea",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Iker",
+              "nombre_completo": "Iker Pacho Del Valle",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "C.D. DERIO",
+          "goles": [
+            {
+              "jugador": "Etxeandía",
+              "jugador_completo": "Jon Etxeandía Murua",
+              "minuto": 22,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916817C22283-19/2025-2026/touring-ke-vs-club-portugalete",
+      "equipos": [
+        {
+          "equipo": "TOURING K.E.",
+          "jugadores": [
+            {
+              "nombre": "Urrosolo",
+              "nombre_completo": "Ibon Urrosolo Elgorriaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Aimar Alvarez",
+              "nombre_completo": "Aimar Álvarez Sanz de Acedo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Jon Garcia",
+              "nombre_completo": "Jon Garcia Echarri",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 46,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Arsuaga",
+              "nombre_completo": "Gorka Arsuaga Cueva",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 46,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Adur",
+              "nombre_completo": "Adur Alsua Apecechea",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 68,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Koldo Ferrer",
+              "nombre_completo": "Koldo Ferrer García",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 68,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Mikel",
+              "nombre_completo": "Mikel Del Alba Ruiz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Álex Iriondo",
+              "nombre_completo": "Alexander Iriondo Cortabarría",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Oinatz",
+              "nombre_completo": "Oinatz Arraras Gabellanes",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Cepas",
+              "nombre_completo": "Jon Cepas Zapico",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Jon Ortiz",
+              "nombre_completo": "Jon Ortiz Alonso",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 68,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Berni",
+              "nombre_completo": "Ignacio Bernal Caperochipi",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 68,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Arteaga",
+              "nombre_completo": "Unai Arteaga Iturria",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 71,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Altuna",
+              "nombre_completo": "Jon Altuna Albisu",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 71,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Zabala",
+              "nombre_completo": "Oihan Zabala Karrikiri",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 46,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Mikel Martin",
+              "nombre_completo": "Mikel Martin Montanet",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 46,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Ramajo",
+              "nombre_completo": "Jon Ramajo Otazo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Oihan",
+              "nombre_completo": "Oihan Dorronsoro Osa",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        },
+        {
+          "equipo": "CLUB PORTUGALETE",
+          "jugadores": [
+            {
+              "nombre": "Ibón González",
+              "nombre_completo": "Ibon González Boubeta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Artola",
+              "nombre_completo": "Iurgi Artola Guezalaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Recio",
+              "nombre_completo": "Iñaki Recio Irusta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 46,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Andoni Pérez",
+              "nombre_completo": "Andoni Pérez Álvarez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 46,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Ander González",
+              "nombre_completo": "Ander González Llaguno",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Lete",
+              "nombre_completo": "Alain Arreitunandía Arrieta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 86,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Belar",
+              "nombre_completo": "Pedro Belar De Gaminde",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 86,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Álex Pérez",
+              "nombre_completo": "Alexander Perez Garitano",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 63,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Xabi Gómez",
+              "nombre_completo": "Xabi Gómez Pérez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 63,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Iñaki Bilbao",
+              "nombre_completo": "Iñaki Bilbao San Miguel",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 77,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Gonzalo Alfaro",
+              "nombre_completo": "Gonzalo Alfaro García Del Cerro",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 77,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Gorka Crespo",
+              "nombre_completo": "Gorka Crespo Carvalho",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Yeray Cuello",
+              "nombre_completo": "Yeray Cuello Villaescusa",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Mikel Ortiz",
+              "nombre_completo": "Mikel Ortiz De Urbina Madrazo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 46,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Tapiador",
+              "nombre_completo": "Gorka Tapiador Igartua",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 46,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Llamazares",
+              "nombre_completo": "Iker Llamazares García",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Alain",
+              "nombre_completo": "Alain Velarde Tejedor",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Ibai Quintana",
+              "nombre_completo": "Ibai Quintana Paredes",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Unai Garcés",
+              "nombre_completo": "Unai Garcés Giraldo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Martín",
+              "nombre_completo": "Martín Fernández de Corres Martínez de Aguirre",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "TOURING K.E.",
+          "goles": [
+            {
+              "jugador": "Zabala",
+              "jugador_completo": "Oihan Zabala Karrikiri",
+              "minuto": 24,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        },
+        {
+          "equipo": "CLUB PORTUGALETE",
+          "goles": [
+            {
+              "jugador": "Andoni Pérez",
+              "jugador_completo": "Andoni Pérez Álvarez",
+              "minuto": 50,
+              "es_penalty": true,
+              "es_propia_meta": false
+            },
+            {
+              "jugador": "Álex Pérez",
+              "jugador_completo": "Alexander Perez Garitano",
+              "minuto": 52,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916818C22283-19/2025-2026/deportivo-alaves-c-vs-sd-deusto",
+      "equipos": [
+        {
+          "equipo": "DEPORTIVO ALAVÉS C",
+          "jugadores": [
+            {
+              "nombre": "Gaizka",
+              "nombre_completo": "Gaizka García Vázquez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Irizar",
+              "nombre_completo": "Manex Irizar Landaribar",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Ibón Martinez",
+              "nombre_completo": "Ibón Martinez de Aramaiona Bercedo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Mikel Relloso",
+              "nombre_completo": "Mikel Relloso Martinez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 77
+            },
+            {
+              "nombre": "Ander Muñoz",
+              "nombre_completo": "Ander Muñoz Company",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 77,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Bueso",
+              "nombre_completo": "Alejandro Bueso Guinot",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 77
+            },
+            {
+              "nombre": "Jon Ander",
+              "nombre_completo": "Jon Ander Barriga Román",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 77,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Iñaki Sáenz",
+              "nombre_completo": "Iñaki Sáenz de Viteri Barrado",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Uria",
+              "nombre_completo": "Iker Uria Porres",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 79
+            },
+            {
+              "nombre": "Lyubo",
+              "nombre_completo": "Daniel Lyubomirov Hvoynev",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 79,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Gustavo",
+              "nombre_completo": "Gustavo Henrique Santos Massuia",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 60
+            },
+            {
+              "nombre": "Eneko Azarloza",
+              "nombre_completo": "Eneko Azarloza Urain",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 60,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Aritz",
+              "nombre_completo": "Aritz Fernández de las Heras Ocio",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Echevarría",
+              "nombre_completo": "Martin Echevarría de Ángel",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 79
+            },
+            {
+              "nombre": "Iñigo Oteo",
+              "nombre_completo": "Iñigo Oteo Catalina",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 79,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Álex López",
+              "nombre_completo": "Alejandro López Albacete",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Pablo",
+              "nombre_completo": "Pablo Vinagre Acedo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Enrique",
+              "nombre_completo": "Enrique Marcos Montalbán González",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Juan Barros",
+              "nombre_completo": "Juan Barros Fernández",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Igor",
+              "nombre_completo": "Igor Ortiz de Arri Martinez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        },
+        {
+          "equipo": "S.D. DEUSTO",
+          "jugadores": [
+            {
+              "nombre": "Markel Crespo",
+              "nombre_completo": "Markel Crespo Alvarez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Saralegi",
+              "nombre_completo": "Unai Saralegi Bidaurreta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Ugartemendia",
+              "nombre_completo": "Iker Ugartemendia Telletxea",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Julen Mateos",
+              "nombre_completo": "Julen Mateos López-Bailó",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Unai López",
+              "nombre_completo": "Unai López Vicente",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Ugaitz",
+              "nombre_completo": "Ugaitz Quevedo Subirada",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 72
+            },
+            {
+              "nombre": "Baroja",
+              "nombre_completo": "Markel Baroja Laita",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 72,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Youssef",
+              "nombre_completo": "Youssef Issakhi Aoussani",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Montero",
+              "nombre_completo": "Iñigo Montero Antúnez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 80
+            },
+            {
+              "nombre": "Daiki",
+              "nombre_completo": "Daiki Niwa",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 80,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Luken",
+              "nombre_completo": "Luken Eskurza García",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 72
+            },
+            {
+              "nombre": "Andiko",
+              "nombre_completo": "Gorka Andikoetxea Simón",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 72,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Aimar Renteria",
+              "nombre_completo": "Aimar Renteria Mendez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 80,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Luis Rodríguez",
+              "nombre_completo": "Luis Rodríguez Ateca",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 80,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Elorrieta",
+              "nombre_completo": "Aratz Elorrieta Arregi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 63
+            },
+            {
+              "nombre": "Soravilla",
+              "nombre_completo": "Ander Soravilla Mata",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 63,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Lander",
+              "nombre_completo": "Lander Gómez González",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Jessy",
+              "nombre_completo": "Jessy Oreol Atte Ndochi",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "DEPORTIVO ALAVÉS C",
+          "goles": [
+            {
+              "jugador": "Iñaki Sáenz",
+              "jugador_completo": "Iñaki Sáenz de Viteri Barrado",
+              "minuto": 46,
+              "es_penalty": true,
+              "es_propia_meta": false
+            },
+            {
+              "jugador": "Aritz",
+              "jugador_completo": "Aritz Fernández de las Heras Ocio",
+              "minuto": 49,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916819C22283-19/2025-2026/aurrera-de-vitoria-vs-cd-lagun-onak",
+      "equipos": [
+        {
+          "equipo": "AURRERÁ DE VITORIA",
+          "jugadores": [
+            {
+              "nombre": "Jon Carbajo",
+              "nombre_completo": "Jon Carbajo Bolinaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Terrazas",
+              "nombre_completo": "Yeray Terrazas Calzada",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Mikel González",
+              "nombre_completo": "Mikel González Ruiz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Abel Ruiz",
+              "nombre_completo": "Abel Ruiz de Arbulo Díaz de Apodaca",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 71,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Markel Esteban",
+              "nombre_completo": "Markel Esteban Rodriguez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 71,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Gastaminza",
+              "nombre_completo": "Hodei Gastaminza López de Luzuriaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Asier Ruiz",
+              "nombre_completo": "Asier Ruiz De Azua Dallo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 59,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Ekaitz Rodríguez",
+              "nombre_completo": "Ekaitz Rodríguez López",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 59,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Jorge García",
+              "nombre_completo": "Jorge García Leon",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 82,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Aostri",
+              "nombre_completo": "Beñat Aostri Ramos",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 82,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Aldabe",
+              "nombre_completo": "Oier Aldabe Ocio",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Aimar Bustero",
+              "nombre_completo": "Aimar Bustero Suárez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 59,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Nico Díaz",
+              "nombre_completo": "Nicolás Díaz Hortelano",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 59,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Urko",
+              "nombre_completo": "Urko López de Juan Abad Portilla",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 71,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Imanol Goikoetxea",
+              "nombre_completo": "Imanol Goikoetxea Unzalu",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 71,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Aimar",
+              "nombre_completo": "Aimar Gexan Anduaga Ramos",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Luca Munari",
+              "nombre_completo": "Luca Munari Vecino",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Joel Martínez",
+              "nombre_completo": "Joel Martínez Arribas",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Jon Albizuri",
+              "nombre_completo": "Jon Albizuri Ibarrondo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Ander Tomás",
+              "nombre_completo": "Ander Tomás Carrasco",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        },
+        {
+          "equipo": "C.D. LAGUN ONAK",
+          "jugadores": [
+            {
+              "nombre": "Jokin",
+              "nombre_completo": "Jokin Arabiourrutia Agirre",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Aimar",
+              "nombre_completo": "Aimar Leunda Etxeberría",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Aritz",
+              "nombre_completo": "Aritz Amenabar Zubizarreta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Markel",
+              "nombre_completo": "Markel Yudego Gabiola",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 61,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Unax",
+              "nombre_completo": "Unax Uría Azpiazu",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 61,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Jakes",
+              "nombre_completo": "Jakes Aranbarri Peñagarikano",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 61,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Manex",
+              "nombre_completo": "Manex Aristi Echeverria",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 61,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Erdozia",
+              "nombre_completo": "Jagoba Erdocia Caballero",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Letamendía",
+              "nombre_completo": "Álex Letamendía Lorente",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Jon Sánchez",
+              "nombre_completo": "Jon Sánchez Jauregui",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Alberdi",
+              "nombre_completo": "Imanol Alberdi Alberdi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 45,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Mikel Letamendia",
+              "nombre_completo": "Mikel Letamendia Agirre",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 45,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Lander",
+              "nombre_completo": "Lander Pecharromán Eizaguirre",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 77,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Jon Sorazu",
+              "nombre_completo": "Jon Sorazu Mangas",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 77,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Ucín",
+              "nombre_completo": "Markel Ucín Bellido",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 89,
+              "goles_a_favor": 0,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Alex Mugica",
+              "nombre_completo": "Alex Mugica Aizpurúa",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 89,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "A. Muñoz Arellano",
+              "nombre_completo": "Aitor Muñoz Arellano",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Madrazo",
+              "nombre_completo": "Aritz Madrazo Iturbe",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "AURRERÁ DE VITORIA",
+          "goles": [
+            {
+              "jugador": "Gastaminza",
+              "jugador_completo": "Hodei Gastaminza López de Luzuriaga",
+              "minuto": 38,
+              "es_penalty": true,
+              "es_propia_meta": false
+            },
+            {
+              "jugador": "Nico Díaz",
+              "jugador_completo": "Nicolás Díaz Hortelano",
+              "minuto": 89,
+              "es_penalty": false,
+              "es_propia_meta": false
+            },
+            {
+              "jugador": "Nico Díaz",
+              "jugador_completo": "Nicolás Díaz Hortelano",
+              "minuto": 91,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        },
+        {
+          "equipo": "C.D. LAGUN ONAK",
+          "goles": [
+            {
+              "jugador": "Unax",
+              "jugador_completo": "Unax Uría Azpiazu",
+              "minuto": 93,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916820C22283-19/2025-2026/sd-leioa-vs-pasaia-ke",
+      "equipos": [
+        {
+          "equipo": "S.D. LEIOA",
+          "jugadores": [
+            {
+              "nombre": "Barandiarán",
+              "nombre_completo": "Ibón Barandiarán García",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Gayoso",
+              "nombre_completo": "Ander Gayoso Reina",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 78,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Santamaría",
+              "nombre_completo": "Asier Santamaría Arranz",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 78,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Asier Arana",
+              "nombre_completo": "Asier Arana Sánchez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Anartz",
+              "nombre_completo": "Anartz Rementería Bilbao",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Gamiz",
+              "nombre_completo": "Mikel Gamiz Etxaniz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 66
+            },
+            {
+              "nombre": "Koldo",
+              "nombre_completo": "Koldobika Santisteban Luzuriaga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 66,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Hernández",
+              "nombre_completo": "David Hernández Chavarri",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 66
+            },
+            {
+              "nombre": "Eder",
+              "nombre_completo": "Eder Aguirregomezcorta Cancelo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 66,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Presa",
+              "nombre_completo": "Ekaitz Presa Viña",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Gorka Garai",
+              "nombre_completo": "Gorka Garai Asla",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Eneko Ruiz",
+              "nombre_completo": "Eneko Ruiz-Olalla Diego",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 72
+            },
+            {
+              "nombre": "Salaberría",
+              "nombre_completo": "Ibai Salaberría Arteaga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 72,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Oier",
+              "nombre_completo": "Oier Díaz de Mendibil Saez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Arzuaga",
+              "nombre_completo": "Íñigo Arzuaga Mesa",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 78
+            },
+            {
+              "nombre": "Goiko",
+              "nombre_completo": "Markel Goikoetxea Unzalu",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 78,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Iñigo",
+              "nombre_completo": "Iñigo (p) García Dominguez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "De Eguino",
+              "nombre_completo": "Iker De Eguino Mendívil",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Ekain",
+              "nombre_completo": "Ekain González Rada",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Markel Crespo",
+              "nombre_completo": "Markel Crespo Ramos",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        },
+        {
+          "equipo": "PASAIA K.E.",
+          "jugadores": [
+            {
+              "nombre": "Juan Berlana",
+              "nombre_completo": "Juan Berlana Galán",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Liher",
+              "nombre_completo": "Liher Amilibia Santa Cruz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 83
+            },
+            {
+              "nombre": "Aritz",
+              "nombre_completo": "Aritz Muñoz Ruiz",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 83,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Urbil",
+              "nombre_completo": "Urbil Fraile Urtizberea",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Learte",
+              "nombre_completo": "Iker Learte Irurtia",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Zubillaga",
+              "nombre_completo": "Ander Zubillaga Otermin",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 72,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Del Puerto",
+              "nombre_completo": "Gorka DelPuerto Blanco",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 72,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Zabaleta",
+              "nombre_completo": "Iñaki Zabaleta Zapiráin",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Oier Barrena",
+              "nombre_completo": "Oier Barrena Suris",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 72
+            },
+            {
+              "nombre": "Ander",
+              "nombre_completo": "Ander Aldareguia Ganzarain",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 72,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Peru",
+              "nombre_completo": "Peru Iriondo Martínez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Delpu",
+              "nombre_completo": "Unai Delpuerto Blanco",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 57
+            },
+            {
+              "nombre": "Ibai",
+              "nombre_completo": "Ibai Ugartemendia Antolín",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 57,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Paul Arrizabalaga",
+              "nombre_completo": "Paul Arrizabalaga Agirre",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Harriet Goñi",
+              "nombre_completo": "Harriet Goñi Cortajarena",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 57
+            },
+            {
+              "nombre": "Oihan Chavez",
+              "nombre_completo": "Oihan Chavez Manso",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 57,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Eizaguirre",
+              "nombre_completo": "Mikel Eizaguirre Camino",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Xabi Fernández",
+              "nombre_completo": "Xabier Fernández Villar",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Ibai",
+              "nombre_completo": "Ibai Sánchez Alvarez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Haroun",
+              "nombre_completo": "Haroun El Abdli Cherkaoui",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "PASAIA K.E.",
+          "goles": [
+            {
+              "jugador": "Liher",
+              "jugador_completo": "Liher Amilibia Santa Cruz",
+              "minuto": 74,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916821C22283-19/2025-2026/sd-eibar-c-vs-real-sociedad-c",
+      "equipos": [
+        {
+          "equipo": "S.D. EIBAR C",
+          "jugadores": [
+            {
+              "nombre": "Marroco",
+              "nombre_completo": "Marc Marroco Rios",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Paul",
+              "nombre_completo": "Paul Francia Bidaguren",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Yarza",
+              "nombre_completo": "Ander Yarza Campos",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Lander",
+              "nombre_completo": "Lander Gastesi Goenaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 62,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Ramos",
+              "nombre_completo": "Oinatz Ramos Trapaga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 62,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "U. Bernal",
+              "nombre_completo": "Unax Bernal Beristain",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Haritz Ortuzar",
+              "nombre_completo": "Haritz Ortuzar Mariño",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Eder",
+              "nombre_completo": "Eder Sánchez Gonzalo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 62,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Zorrozua",
+              "nombre_completo": "Mitxel Zorrozua Díaz",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 62,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Gromaz",
+              "nombre_completo": "Jon Andoni Gromaz Llaguno",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 89,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Oihan",
+              "nombre_completo": "Oihan Gartzia Saralegi",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 89,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Mario Fuente",
+              "nombre_completo": "Mario Fuente Fernández",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 62,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Beñat",
+              "nombre_completo": "Beñat Hurtado Horna",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 62,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Álex Llorens",
+              "nombre_completo": "Álex Llorens Faubell",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 84,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Nores",
+              "nombre_completo": "Alejandro Nores Souto",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 84,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Beñat Alejo",
+              "nombre_completo": "Beñat Alejo Lejárraga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 2,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Ibrahim",
+              "nombre_completo": "Ibrahim El Houas González",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Joseba",
+              "nombre_completo": "Joseba Ituarte Olano",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Peio",
+              "nombre_completo": "Peio Cerro Isasi",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Markel",
+              "nombre_completo": "Markel Intxaurraga Ibarrondo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        },
+        {
+          "equipo": "REAL SOCIEDAD C",
+          "jugadores": [
+            {
+              "nombre": "Javi Jiménez",
+              "nombre_completo": "Javier Jiménez Jiménez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Imanol Ruiz",
+              "nombre_completo": "Imanol Ruiz De Illa Rivas",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 45,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Markel",
+              "nombre_completo": "Markel Elcano Estremo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 45,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Anartz",
+              "nombre_completo": "Anartz Segurola Olaizola",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Oleaga",
+              "nombre_completo": "Joan Oleaga Arregi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Eloy Nebreda",
+              "nombre_completo": "Eloy Nebreda Martínez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 52,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Jakes",
+              "nombre_completo": "Jakes Gorosabel Añorga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 52,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Iker Calderón",
+              "nombre_completo": "Iker Calderón Balda",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Santi",
+              "nombre_completo": "Santiago David Joseph Isaiah O Samuyiwa",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 73,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Peral",
+              "nombre_completo": "Markel Peral Silva",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 73,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Ibai Cabo",
+              "nombre_completo": "Ibai Cabo Beristain",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Iker Ferrer",
+              "nombre_completo": "Iker Ferrer Owono",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 52,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Sylla",
+              "nombre_completo": "Alya Adama Sylla",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 52,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Danel",
+              "nombre_completo": "Danel López Egaña",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Jon De Orue",
+              "nombre_completo": "Jon De Orue Otamendi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 45,
+              "goles_a_favor": 1,
+              "goles_en_contra": 2
+            },
+            {
+              "nombre": "Unax Ayo",
+              "nombre_completo": "Unax Ayo Larrañaga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 45,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Azkárraga",
+              "nombre_completo": "Unax Azkárraga Arrospide",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Xalbat",
+              "nombre_completo": "Xalbat Larralde",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Manuel Saenz",
+              "nombre_completo": "Manuel Saenz Ruiz",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Liam Baro",
+              "nombre_completo": "Liam Baro Bartolomé",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "S.D. EIBAR C",
+          "goles": [
+            {
+              "jugador": "Beñat Alejo",
+              "jugador_completo": "Beñat Alejo Lejárraga",
+              "minuto": 37,
+              "es_penalty": false,
+              "es_propia_meta": false
+            },
+            {
+              "jugador": "Mario Fuente",
+              "jugador_completo": "Mario Fuente Fernández",
+              "minuto": 44,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        },
+        {
+          "equipo": "REAL SOCIEDAD C",
+          "goles": [
+            {
+              "jugador": "Ibai Cabo",
+              "jugador_completo": "Ibai Cabo Beristain",
+              "minuto": 41,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916822C22283-19/2025-2026/añorga-kke-vs-cd-santurtzi",
+      "equipos": [
+        {
+          "equipo": "AÑORGA K.K.E.",
+          "jugadores": [
+            {
+              "nombre": "Kerman Urain",
+              "nombre_completo": "Kerman Urain San Vicente",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Peru",
+              "nombre_completo": "Peru Larrañaga Arzubialde",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Iker Yániz",
+              "nombre_completo": "Iker Yániz Ercibengoa",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Iker Iraola",
+              "nombre_completo": "Iker Iraola Vicente",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Castrillo",
+              "nombre_completo": "Beñat Castrillo Maestro",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Imanol Urain",
+              "nombre_completo": "Imanol Urain San Vicente",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Aitor Otxoa",
+              "nombre_completo": "Aitor Otxoa de Eribe Aldasoro",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 63,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Gonzalo Rodrigo",
+              "nombre_completo": "Gonzalo Rodrigo Caperos",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 63,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Patxi Yarza",
+              "nombre_completo": "Patxi Yarza Recondo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Zeziaga",
+              "nombre_completo": "Jokin Zeziaga Larrea",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 91,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Liher",
+              "nombre_completo": "Liher Arrizabalaga Agirre",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 91,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Julen Prior",
+              "nombre_completo": "Julen Prior Rementería",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 71,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Segura",
+              "nombre_completo": "Eneko Segura Cajigos",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 71,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Patxi Aizpuru",
+              "nombre_completo": "Patxi Aizpurua Estensoro",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Aitor Echarri",
+              "nombre_completo": "Aitor Echarri Feced",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Gibelalde",
+              "nombre_completo": "Nikolas Gibelalde Garate",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Malick",
+              "nombre_completo": "Ander Malick Gaye Zardoya",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        },
+        {
+          "equipo": "C.D. SANTURTZI",
+          "jugadores": [
+            {
+              "nombre": "Unai Llorente",
+              "nombre_completo": "Unai Andoni Llorente Carrasco",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Javi Echevarría",
+              "nombre_completo": "Javier Echevarria Querejeta",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 58,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Aimar",
+              "nombre_completo": "Aimar Gomez Corral",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 58,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Echaniz",
+              "nombre_completo": "Adrián  Echaniz Valverde",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Igarki",
+              "nombre_completo": "Igarki Grande del Campo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Matey",
+              "nombre_completo": "Unai Matey Monge",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Mikel Zatón",
+              "nombre_completo": "Mikel Zatón Escudero",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Diego Ruiz",
+              "nombre_completo": "Diego Ruiz Lamborena",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Cabanas",
+              "nombre_completo": "Hugo Cabanas Camoira",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 46,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Beñat Hernández",
+              "nombre_completo": "Beñat Hernández Zarraga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 46,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Mikel Escobar",
+              "nombre_completo": "Mikel Escobar Leonardo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Aitor Guerras",
+              "nombre_completo": "Aitor Guerras Abaitua",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 58,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Joseba",
+              "nombre_completo": "Joseba Castaño Quirós",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 58,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Zaid",
+              "nombre_completo": "Zaid Ouldeniymia Darrak",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 75,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Iker",
+              "nombre_completo": "Iker Cid Margalef",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 75,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Eder Fernández",
+              "nombre_completo": "Eder Fernández Otero",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Arambarri",
+              "nombre_completo": "Jon Arambarri Ordozgoiti",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Carlos González",
+              "nombre_completo": "Carlos González Pascual",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "AÑORGA K.K.E.",
+          "goles": [
+            {
+              "jugador": "Aitor Otxoa",
+              "jugador_completo": "Aitor Otxoa de Eribe Aldasoro",
+              "minuto": 57,
+              "es_penalty": true,
+              "es_propia_meta": false
+            }
+          ]
+        },
+        {
+          "equipo": "C.D. SANTURTZI",
+          "goles": [
+            {
+              "jugador": "Matey",
+              "jugador_completo": "Unai Matey Monge",
+              "minuto": 97,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916823C22283-19/2025-2026/cultural-durango-vs-sd-zamudio",
+      "equipos": [
+        {
+          "equipo": "CULTURAL DURANGO",
+          "jugadores": [
+            {
+              "nombre": "Areitio",
+              "nombre_completo": "Markel Areitio Cedrún",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Erik Polanco",
+              "nombre_completo": "Erik Polanco Gómez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Artabe",
+              "nombre_completo": "Ander Artabe Sánchez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Joseba",
+              "nombre_completo": "Joseba Pérez Escudero",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Haitz",
+              "nombre_completo": "Haitz López Vitores",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Borja López",
+              "nombre_completo": "Borja López de Aguileta Martínez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 80,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Franco",
+              "nombre_completo": "Daniel Alexander Franco Chaverra",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 80,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Gorroño",
+              "nombre_completo": "Mikel Gorroño Bikandi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Filippini",
+              "nombre_completo": "Jon Filippini Txakartegi",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 63,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Unai Arieta",
+              "nombre_completo": "Unai Arietaleanizbeaskoa Miota",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 63,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Peio",
+              "nombre_completo": "Peio Fontal Martínez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 80,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Apezetxea",
+              "nombre_completo": "Oier Apezetxea Muñagorri",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 80,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Kepa",
+              "nombre_completo": "Kepa Goicoechea Iturria",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 89,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Lejardi",
+              "nombre_completo": "Jon Lejardi Berrio",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 89,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Gontzal",
+              "nombre_completo": "Gontzal Ariño Yurrebaso",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 80,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Edorta",
+              "nombre_completo": "Edorta Vázquez Clemente",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 80,
+              "minuto_salida": 90,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Eneko",
+              "nombre_completo": "Eneko Hernando Delgado",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Denis",
+              "nombre_completo": "Denis Baz Echevarria",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Anartz",
+              "nombre_completo": "Anartz Mendiolagaray Mendia",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Zabaleta",
+              "nombre_completo": "Mikel Zabaleta Zumarraga",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        },
+        {
+          "equipo": "S.D. ZAMUDIO",
+          "jugadores": [
+            {
+              "nombre": "Gorka Campo",
+              "nombre_completo": "Gorka Campo Loza",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Santamaría",
+              "nombre_completo": "Unai Santamaría Arranz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Bernaola",
+              "nombre_completo": "Oier Bernaola Lazkoz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Calderón",
+              "nombre_completo": "Endika Calderón Montero",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Javi Alonso",
+              "nombre_completo": "Javier Alonso Echevarría",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 71,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Urkiza",
+              "nombre_completo": "Martín Urkiza Aldama",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 71,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Iñigo",
+              "nombre_completo": "Iñigo Sánchez Rodríguez Maribona",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 57,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Aimar",
+              "nombre_completo": "Aimar Oliveros Hierro",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 57,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Ariztimuño",
+              "nombre_completo": "Íñigo Ariztimuño López",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Aitzol",
+              "nombre_completo": "Aitzol González Corrales",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 65,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Aritz Pascual",
+              "nombre_completo": "Aritz Pascual Díez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 65,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Unax",
+              "nombre_completo": "Unax Rojas Alcedo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Ibarra",
+              "nombre_completo": "Mikel Ibarra Bartolomé",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 57,
+              "goles_a_favor": 0,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Txapu",
+              "nombre_completo": "Xabier Infante Cueto",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 57,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 1,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Eloy Ortega",
+              "nombre_completo": "Eloy Ortega González",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 65,
+              "goles_a_favor": 0,
+              "goles_en_contra": 1
+            },
+            {
+              "nombre": "Oier Garai",
+              "nombre_completo": "Oier Garai Petralanda",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 65,
+              "minuto_salida": 90,
+              "goles_a_favor": 1,
+              "goles_en_contra": 0
+            },
+            {
+              "nombre": "Pablo Fid",
+              "nombre_completo": "Pablo Fid Martín",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Odriozola",
+              "nombre_completo": "Iker Odriozola Carreño",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Braceras",
+              "nombre_completo": "Mikel Braceras Carrillo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            },
+            {
+              "nombre": "Hugo Fernández",
+              "nombre_completo": "Hugo Fernández de Castro",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null,
+              "goles_a_favor": null,
+              "goles_en_contra": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "CULTURAL DURANGO",
+          "goles": [
+            {
+              "jugador": "Filippini",
+              "jugador_completo": "Jon Filippini Txakartegi",
+              "minuto": 61,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        },
+        {
+          "equipo": "S.D. ZAMUDIO",
+          "goles": [
+            {
+              "jugador": "Oier Garai",
+              "jugador_completo": "Oier Garai Petralanda",
+              "minuto": 84,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.lapreferente.com/P3916824C22283-19/2025-2026/zarautz-ke-vs-ud-aretxabaleta",
+      "equipos": [
+        {
+          "equipo": "ZARAUTZ K.E.",
+          "jugadores": [
+            {
+              "nombre": "Alex",
+              "nombre_completo": "Alex Agirrezabal Larrañaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Jon",
+              "nombre_completo": "Jon Aizpurua Iriondo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Denis",
+              "nombre_completo": "Denis Gastanares Isasti",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 64,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Unax",
+              "nombre_completo": "Unax Otermin Orbegozo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 64,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Julen",
+              "nombre_completo": "Julen Manterola Elola",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Dani Marín",
+              "nombre_completo": "Daniel Marín Arrizabalaga",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Haritz",
+              "nombre_completo": "Haritz Unanue Etxeberría",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Iñigo",
+              "nombre_completo": "Iñigo Fernández de Casadevante Facchin",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 64
+            },
+            {
+              "nombre": "Unai Alfageme",
+              "nombre_completo": "Unai Alfageme Pérez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 64,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Irigoien",
+              "nombre_completo": "Ander Irigoien Etxabe",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 74
+            },
+            {
+              "nombre": "David",
+              "nombre_completo": "David Elías Singleton Sorasu",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 74,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Ander",
+              "nombre_completo": "Ander Aranburu Parapar",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 68
+            },
+            {
+              "nombre": "Aguila",
+              "nombre_completo": "Mikel Aguila Olazabal",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 68,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Peinador",
+              "nombre_completo": "Unax Peinador Azpiroz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Unai Etxeberria",
+              "nombre_completo": "Unai Etxeberría Amilibia",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 68
+            },
+            {
+              "nombre": "Jon",
+              "nombre_completo": "Jon Peñagaricano Leiva",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 68,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Erik Pereira",
+              "nombre_completo": "Erik Pereira Altuna",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        },
+        {
+          "equipo": "U.D. ARETXABALETA",
+          "jugadores": [
+            {
+              "nombre": "Urko Muguerza",
+              "nombre_completo": "Urko Muguerza Pertusa",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Lasagabaster",
+              "nombre_completo": "Ibai Lasagabaster Mancebo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Josu Aizpurua",
+              "nombre_completo": "Josu Aizpurua Olabe",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 67
+            },
+            {
+              "nombre": "Manex Ibarrondo",
+              "nombre_completo": "Manex Ibarrondo Martínez",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 67,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Ekain Ugalde",
+              "nombre_completo": "Ekain Ugalde Duñabeitia",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Jagoba Lasa",
+              "nombre_completo": "Jagoba Lasa Sanz",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 59
+            },
+            {
+              "nombre": "Ibon Pérez",
+              "nombre_completo": "Ibon Pérez De Labeaga Unanue",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 59,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Lucas Gomes",
+              "nombre_completo": "Lucas Felipe Gomes Capelo",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 59,
+              "tarjetas": [
+                "yellow"
+              ]
+            },
+            {
+              "nombre": "Eneko García",
+              "nombre_completo": "Eneko García Garay",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 59,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Madina",
+              "nombre_completo": "Aimar Madina Arriola",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Zumarraga",
+              "nombre_completo": "Eñaut Zumarraga Aranburu",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Markel Arosa",
+              "nombre_completo": "Markel Arosa Elcoroiribe",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 59
+            },
+            {
+              "nombre": "Unax Sánchez",
+              "nombre_completo": "Unax Sánchez Iparragirre",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 59,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Iker Salamanca",
+              "nombre_completo": "Iker Salamanca Mendía",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 70
+            },
+            {
+              "nombre": "Pacheco",
+              "nombre_completo": "Ander Fernández Pacheco",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": 70,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Zanguitu",
+              "nombre_completo": "Unax Zanguitu Sánchez",
+              "titular": true,
+              "convocado": true,
+              "minuto_entrada": 0,
+              "minuto_salida": 90
+            },
+            {
+              "nombre": "Unai Beloki",
+              "nombre_completo": "Unai Beloki Leceta",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Orbegozo",
+              "nombre_completo": "Joseba Orbegozo Azkondo",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            },
+            {
+              "nombre": "Endika",
+              "nombre_completo": "Endika Sáez de Eguilaz Pulido",
+              "titular": false,
+              "convocado": true,
+              "minuto_entrada": null,
+              "minuto_salida": null
+            }
+          ]
+        }
+      ],
+      "goles": [
+        {
+          "equipo": "ZARAUTZ K.E.",
+          "goles": [
+            {
+              "jugador": "Unai Alfageme",
+              "jugador_completo": "Unai Alfageme Pérez",
+              "minuto": 67,
+              "es_penalty": false,
+              "es_propia_meta": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

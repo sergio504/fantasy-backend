@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { eq, desc, inArray, and } from 'drizzle-orm'
+import { eq, desc, inArray, and, asc } from 'drizzle-orm'
 import { db } from '../db'
-import { jugador, jugadorEquipo, estadisticaJornada, jornada, snapshotAlineacion, miembroLiga, usuario, Posicion } from '../db/schema'
+import { jugador, jugadorEquipo, estadisticaJornada, jornada, snapshotAlineacion, miembroLiga, usuario, historialValorJugador, historialClausula, Posicion } from '../db/schema'
 
 export const getJugadores = async (req: Request, res: Response) => {
   try {
@@ -80,5 +80,30 @@ export const getEstadisticasJugador = async (req: Request, res: Response) => {
     res.json(resultado)
   } catch {
     res.status(500).json({ error: 'Error al obtener estadísticas' })
+  }
+}
+
+export const getHistorialValorJugador = async (req: Request, res: Response) => {
+  const jugadorId = req.params.id as string
+  try {
+    const rows = await db.select().from(historialValorJugador)
+      .where(eq(historialValorJugador.jugadorId, jugadorId))
+      .orderBy(asc(historialValorJugador.numJornada))
+    res.json(rows)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener historial de valor' })
+  }
+}
+
+export const getHistorialClausulaJugador = async (req: Request, res: Response) => {
+  const jugadorId = req.params.id as string
+  const ligaId    = req.query.ligaId as string | undefined
+  try {
+    const rows = await db.select().from(historialClausula)
+      .where(and(eq(historialClausula.jugadorId, jugadorId), ligaId ? eq(historialClausula.ligaId, ligaId) : undefined))
+      .orderBy(asc(historialClausula.creadoEn))
+    res.json(rows)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener historial de cláusula' })
   }
 }

@@ -1,0 +1,289 @@
+{
+  "jornada": "JORNADA 1 - 6/9/2025",
+  "url": "https://www.lapreferente.com/P3916816C22283-19/2025-2026/cd-derio-vs-cd-san-ignacio",
+  "equipos": [
+    {
+      "equipo": "C.D. DERIO",
+      "jugadores": [
+        {
+          "nombre": "Kevin Ríos",
+          "nombre_completo": "Kevin Ríos Zapata",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Etxeandía",
+          "nombre_completo": "Jon Etxeandía Murua",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Lechosa",
+          "nombre_completo": "Unai Lechosa Alonso",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Christian",
+          "nombre_completo": "Christian Gabiña Tovar",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 54
+        },
+        {
+          "nombre": "Mayo",
+          "nombre_completo": "Markel Mayo Arce",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Álvaro",
+          "nombre_completo": "Álvaro Fernández Fijo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Iker Montes",
+          "nombre_completo": "Iker Montes Arroyo",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 82
+        },
+        {
+          "nombre": "Barrón",
+          "nombre_completo": "Julen Barrón Artetxe",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Guipu",
+          "nombre_completo": "Jon Ander Saralegui Odriozola",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 82
+        },
+        {
+          "nombre": "Uztaritz",
+          "nombre_completo": "Uztaritz Expósito Etxegarai",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Del Campo",
+          "nombre_completo": "Iván Del Campo De la Llosa",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 63
+        },
+        {
+          "nombre": "Egileor",
+          "nombre_completo": "Ander Egileor Zuazo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Ander Calle",
+          "nombre_completo": "Ander Calle Arroyo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "De la Parra",
+          "nombre_completo": "Ander De la Parra Otamendi",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Xabier Ugalde",
+          "nombre_completo": "Xabier Ugalde Carral",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Dani Jiménez",
+          "nombre_completo": "Daniel  Jiménez Gómez",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 54
+        },
+        {
+          "nombre": "Jon",
+          "nombre_completo": "Jon García Támara",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Imaz",
+          "nombre_completo": "Asier Imaz Lasa",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Ander",
+          "nombre_completo": "Ander Gonzalo Lago",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Sendoa",
+          "nombre_completo": "Sendoa Urruticoechea Macias",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        }
+      ]
+    },
+    {
+      "equipo": "C.D. SAN IGNACIO",
+      "jugadores": [
+        {
+          "nombre": "Iván Sanz",
+          "nombre_completo": "Ivan Sanz de Galdeano Sánchez",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Urbina",
+          "nombre_completo": "Adrián Ortiz de Urbina Madrazo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Aitor Ruiz",
+          "nombre_completo": "Aitor Ruiz de Mendarozqueta Vivas",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Joseba",
+          "nombre_completo": "Joseba Eiguren Llona",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 45
+        },
+        {
+          "nombre": "Aitor Iriondo",
+          "nombre_completo": "Aitor Iriondo Valdivielso",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Iñaki Ormazábal",
+          "nombre_completo": "Iñaki Ormazábal García",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Beñat",
+          "nombre_completo": "Beñat Diaz de Mendibil Saez",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Ivan Fernandez",
+          "nombre_completo": "Ivan Fernandez Simon",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Galceran",
+          "nombre_completo": "Aleix  Galceran Cruz",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 77
+        },
+        {
+          "nombre": "Lizundia",
+          "nombre_completo": "Enaitz Lizundia Nafarrate",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Faculty",
+          "nombre_completo": "Faculty Osamudiamen Oviawe",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 64
+        },
+        {
+          "nombre": "Julen Castillo",
+          "nombre_completo": "Julen Castillo Sagarduy",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Beñat",
+          "nombre_completo": "Beñat Martínez de Albeniz Mendía",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Testimony",
+          "nombre_completo": "Testimony Onukwuru Onukwuru",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0
+        },
+        {
+          "nombre": "Unax Fernández",
+          "nombre_completo": "Unax Fernández de las Heras Ocio",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Ander",
+          "nombre_completo": "Ander Amezgaray Gómez",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Pablo García",
+          "nombre_completo": "Pablo García González",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Xabi",
+          "nombre_completo": "Xabier Elorduy Navea",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        },
+        {
+          "nombre": "Iker",
+          "nombre_completo": "Iker Pacho Del Valle",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null
+        }
+      ]
+    }
+  ]
+}

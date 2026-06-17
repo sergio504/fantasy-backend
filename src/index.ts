@@ -7,6 +7,7 @@ import jugadorRoutes from './routes/player.routes'
 import mercadoRoutes from './routes/market.routes'
 import adminRoutes from './routes/admin.routes'
 import jornadaRoutes from './routes/jornada.routes'
+import clausulazoRoutes from './routes/clausulazo.routes'
 import { ponerJugadoresEnMercado, resolverOfertasCaducadas } from './jobs/mercadoAutomatico'
 
 dotenv.config()
@@ -21,6 +22,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/ligas', ligaRoutes)
 app.use('/api/ligas/:ligaId/mercado', mercadoRoutes)
+app.use('/api/ligas/:ligaId/plantillas', clausulazoRoutes)
 app.use('/api/jugadores', jugadorRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/jornadas', jornadaRoutes)

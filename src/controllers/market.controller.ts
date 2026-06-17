@@ -5,6 +5,7 @@ import { db } from '../db'
 import { ofertaMercado, puja, miembroLiga, plantillaFantasy, titularLiga, jugadorEquipo, equipo, jugador, usuario, transferencia } from '../db/schema'
 import { AuthRequest } from '../middleware/auth.middleware'
 import { cerrarOfertaLogic } from '../lib/cerrarOfertaLogic'
+import { registrarMovimientoSaldo } from '../lib/historial'
 
 async function getMiembro(ligaId: string, usuarioId: string) {
   return db.query.miembroLiga.findFirst({
@@ -271,10 +272,21 @@ export const ventaRapida = async (req: AuthRequest, res: Response) => {
     await db.delete(plantillaFantasy)
       .where(and(eq(plantillaFantasy.ligaId, ligaId), eq(plantillaFantasy.jugadorId, jugadorId)))
 
+    const saldoNuevo = miembro.presupuestoRestante + precio
     // Ingresar la mitad del valor al presupuesto
     await db.update(miembroLiga)
-      .set({ presupuestoRestante: miembro.presupuestoRestante + precio })
+      .set({ presupuestoRestante: saldoNuevo })
       .where(eq(miembroLiga.id, miembro.id))
+
+    await registrarMovimientoSaldo(db, {
+      miembroLigaId:   miembro.id,
+      ligaId,
+      concepto:        'VENTA_RAPIDA',
+      importe:         precio,
+      saldoResultante: saldoNuevo,
+      descripcion:     `Venta rápida de ${jugadorData.nombre}`,
+      jugadorId,
+    })
 
     res.json({ precio, mensaje: `${jugadorData.nombre} vendido por ${precio}M` })
   } catch {

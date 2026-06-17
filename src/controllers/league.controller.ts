@@ -1,14 +1,16 @@
 import { randomUUID } from 'crypto'
 import { Request, Response } from 'express'
-import { eq, and, notInArray, inArray, count, desc, exists } from 'drizzle-orm'
+import { eq, and, notInArray, inArray, count, desc, asc, lte, gte, sum, exists, sql } from 'drizzle-orm'
 import { db } from '../db'
 import {
   liga, miembroLiga, jugador, jugadorEquipo, equipo, usuario,
   plantillaFantasy, titularLiga, snapshotAlineacion, jornada,
-  estadisticaJornada, puntuacionJornada,
+  estadisticaJornada, puntuacionJornada, clausulazoPendiente,
+  historialSaldo,
   Division, Posicion,
 } from '../db/schema'
 import { AuthRequest } from '../middleware/auth.middleware'
+import { registrarMovimientoSaldo, registrarCambioClausula } from '../lib/historial'
 import crypto from 'crypto'
 
 // ─── HELPER: asignar 16 jugadores aleatorios al unirse ─
@@ -45,8 +47,16 @@ export async function asignarJugadoresIniciales(
   if (seleccionados.length < 16) throw new Error(`No hay suficientes jugadores libres en la división ${division}`)
 
   await tx.insert(plantillaFantasy).values(
-    seleccionados.map(j => ({ id: randomUUID(), ligaId, miembroLigaId, jugadorId: j.id, precioCompra: j.valor, creadoEn: new Date() }))
+    seleccionados.map(j => ({ id: randomUUID(), ligaId, miembroLigaId, jugadorId: j.id, precioCompra: j.valor, clausula: j.valor * 2, jornadasBloqueo: 3, creadoEn: new Date() }))
   )
+
+  // Historial de cláusula inicial por cada jugador asignado
+  for (const j of seleccionados) {
+    await registrarCambioClausula(tx, {
+      jugadorId: j.id, ligaId, miembroLigaId,
+      clausulaAnterior: 0, clausulaNueva: j.valor * 2, motivo: 'ADQUISICION',
+    })
+  }
 }
 
 // ─── CREAR LIGA ────────────────────────────────────
@@ -72,6 +82,7 @@ export const crearLiga = async (req: AuthRequest, res: Response) => {
     const ligaCreada = await db.transaction(async tx => {
       await tx.insert(liga).values({ id: ligaId, nombre, creadorId, division, publica: esPublica, codigoInvitacion, maxEquipos: maxEquipos ?? 10, presupuestoInicial: presupuesto, creadoEn: now })
       await tx.insert(miembroLiga).values({ id: miembroId, ligaId, usuarioId: creadorId, presupuestoRestante: presupuesto, creadoEn: now })
+      await registrarMovimientoSaldo(tx, { miembroLigaId: miembroId, ligaId, concepto: 'PRESUPUESTO_INICIAL', importe: presupuesto, saldoResultante: presupuesto, descripcion: `Presupuesto inicial de la liga` })
       await asignarJugadoresIniciales(miembroId, ligaId, division, tx as any)
       const [l] = await tx.select().from(liga).where(eq(liga.id, ligaId)).limit(1)
       const miembros = await tx.select().from(miembroLiga).where(eq(miembroLiga.ligaId, ligaId))
@@ -100,6 +111,7 @@ export const unirseALiga = async (req: AuthRequest, res: Response) => {
     const miembroId = randomUUID()
     const miembro = await db.transaction(async tx => {
       await tx.insert(miembroLiga).values({ id: miembroId, ligaId, usuarioId, presupuestoRestante: ligaData.presupuestoInicial, creadoEn: new Date() })
+      await registrarMovimientoSaldo(tx, { miembroLigaId: miembroId, ligaId, concepto: 'PRESUPUESTO_INICIAL', importe: ligaData.presupuestoInicial, saldoResultante: ligaData.presupuestoInicial, descripcion: `Presupuesto inicial de la liga` })
       await asignarJugadoresIniciales(miembroId, ligaId, ligaData.division, tx as any)
       const [m] = await tx.select().from(miembroLiga).where(eq(miembroLiga.id, miembroId)).limit(1)
       return m
@@ -128,6 +140,7 @@ export const unirseConCodigo = async (req: AuthRequest, res: Response) => {
     const miembroId = randomUUID()
     const miembro = await db.transaction(async tx => {
       await tx.insert(miembroLiga).values({ id: miembroId, ligaId: ligaData.id, usuarioId, presupuestoRestante: ligaData.presupuestoInicial, creadoEn: new Date() })
+      await registrarMovimientoSaldo(tx, { miembroLigaId: miembroId, ligaId: ligaData.id, concepto: 'PRESUPUESTO_INICIAL', importe: ligaData.presupuestoInicial, saldoResultante: ligaData.presupuestoInicial, descripcion: `Presupuesto inicial de la liga` })
       await asignarJugadoresIniciales(miembroId, ligaData.id, ligaData.division, tx as any)
       const [m] = await tx.select().from(miembroLiga).where(eq(miembroLiga.id, miembroId)).limit(1)
       return m
@@ -245,6 +258,7 @@ export const getMiEquipo = async (req: AuthRequest, res: Response) => {
         pfId: plantillaFantasy.id, pfLigaId: plantillaFantasy.ligaId,
         pfMiembroLigaId: plantillaFantasy.miembroLigaId, pfJugadorId: plantillaFantasy.jugadorId,
         pfPrecioCompra: plantillaFantasy.precioCompra, pfCreadoEn: plantillaFantasy.creadoEn,
+        pfClausula: plantillaFantasy.clausula, pfJornadasBloqueo: plantillaFantasy.jornadasBloqueo,
         jId: jugador.id, jNombreCompleto: jugador.nombreCompleto, jNombre: jugador.nombre,
         jDorsal: jugador.dorsal, jFechaNacimiento: jugador.fechaNacimiento, jEdad: jugador.edad,
         jPosicion: jugador.posicion, jValor: jugador.valor, jCreadoEn: jugador.creadoEn,
@@ -271,17 +285,24 @@ export const getMiEquipo = async (req: AuthRequest, res: Response) => {
       equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
     }]))
 
-    const titularesSet = new Set(
+    const [titularesSet, pendientesClausulazo] = await Promise.all([
       jugadorIds.length > 0
-        ? (await db.select({ jugadorId: titularLiga.jugadorId })
+        ? db.select({ jugadorId: titularLiga.jugadorId })
             .from(titularLiga).where(eq(titularLiga.miembroLigaId, miembro.id))
-          ).map(t => t.jugadorId)
-        : []
-    )
+            .then(rows => new Set(rows.map(t => t.jugadorId)))
+        : Promise.resolve(new Set<string>()),
+      jugadorIds.length > 0
+        ? db.select().from(clausulazoPendiente)
+            .where(and(eq(clausulazoPendiente.ligaId, ligaId), inArray(clausulazoPendiente.jugadorId, jugadorIds)))
+        : Promise.resolve([]),
+    ])
+    const pendienteSet = new Set(pendientesClausulazo.map(cp => cp.jugadorId))
 
     res.json(plantillaRaw.map(p => ({
       id: p.pfId, ligaId: p.pfLigaId, miembroLigaId: p.pfMiembroLigaId,
       jugadorId: p.pfJugadorId, precioCompra: p.pfPrecioCompra, creadoEn: p.pfCreadoEn,
+      clausula: p.pfClausula, jornadasBloqueo: p.pfJornadasBloqueo,
+      clausulazoPendiente: pendienteSet.has(p.pfJugadorId),
       esTitular: titularesSet.has(p.pfJugadorId),
       jugador: {
         id: p.jId, nombreCompleto: p.jNombreCompleto, nombre: p.jNombre,
@@ -610,5 +631,111 @@ export const guardarAlineacion = async (req: AuthRequest, res: Response) => {
     res.json({ mensaje: 'Alineación guardada', formacion, titulares: jugadorIds.length, capitanId: capitanId ?? null })
   } catch {
     res.status(500).json({ error: 'Error al guardar la alineación' })
+  }
+}
+
+// ─── HISTORIAL DE SALDO ────────────────────────────
+
+export const getHistorialSaldo = async (req: AuthRequest, res: Response) => {
+  const ligaId    = req.params.ligaId as string
+  const usuarioId = req.usuarioId!
+
+  try {
+    const miembro = await db.query.miembroLiga.findFirst({
+      where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)),
+    })
+    if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
+
+    const rows = await db
+      .select({
+        hs:          historialSaldo,
+        jNombre:     jugador.nombre,
+      })
+      .from(historialSaldo)
+      .leftJoin(jugador, eq(jugador.id, historialSaldo.jugadorId))
+      .where(eq(historialSaldo.miembroLigaId, miembro.id))
+      .orderBy(asc(historialSaldo.creadoEn))
+
+    res.json(rows.map(r => ({
+      ...r.hs,
+      jugadorNombre: r.jNombre ?? null,
+    })))
+  } catch {
+    res.status(500).json({ error: 'Error al obtener el historial de saldo' })
+  }
+}
+
+// ─── CLASIFICACIÓN POR JORNADA ─────────────────────
+
+export const getClasificacion = async (req: AuthRequest, res: Response) => {
+  const ligaId    = req.params.ligaId as string
+  const usuarioId = req.usuarioId!
+  const { modo, num } = req.query as { modo?: string; num?: string }
+
+  try {
+    const [ligaRow] = await db.select().from(liga).where(eq(liga.id, ligaId)).limit(1)
+    if (!ligaRow) { res.status(404).json({ error: 'Liga no encontrada' }); return }
+
+    const miembro = await db.query.miembroLiga.findFirst({
+      where: and(eq(miembroLiga.ligaId, ligaId), eq(miembroLiga.usuarioId, usuarioId)),
+    })
+    if (!miembro) { res.status(403).json({ error: 'No eres miembro de esta liga' }); return }
+
+    const miembros = await db
+      .select({ id: miembroLiga.id, usuarioId: miembroLiga.usuarioId, username: usuario.username, presupuestoRestante: miembroLiga.presupuestoRestante })
+      .from(miembroLiga)
+      .innerJoin(usuario, eq(usuario.id, miembroLiga.usuarioId))
+      .where(eq(miembroLiga.ligaId, ligaId))
+
+    const miembroIds = miembros.map(m => m.id)
+
+    // Función para construir la clasificación a partir de un mapa de puntos
+    const buildResult = (puntosMap: Map<string, number>) =>
+      miembros
+        .map(m => ({ ...m, puntos: puntosMap.get(m.id) ?? 0 }))
+        .sort((a, b) => b.puntos - a.puntos)
+
+    if (!modo || modo === 'total') {
+      if (miembroIds.length === 0) return res.json([])
+      const totales = await db
+        .select({ miembroLigaId: puntuacionJornada.miembroLigaId, puntos: sum(puntuacionJornada.puntos) })
+        .from(puntuacionJornada)
+        .where(inArray(puntuacionJornada.miembroLigaId, miembroIds))
+        .groupBy(puntuacionJornada.miembroLigaId)
+      return res.json(buildResult(new Map(totales.map(t => [t.miembroLigaId, Number(t.puntos ?? 0)]))))
+    }
+
+    const numJornada = parseInt(num ?? '1', 10)
+    if (isNaN(numJornada)) { res.status(400).json({ error: 'num debe ser un número' }); return }
+
+    // Jornadas de la división de esta liga
+    const jornadasDivision = await db.select().from(jornada)
+      .where(eq(jornada.division, ligaRow.division))
+      .orderBy(asc(jornada.numJornada))
+
+    if (modo === 'jornada') {
+      const jornadaRow = jornadasDivision.find(j => j.numJornada === numJornada)
+      if (!jornadaRow || miembroIds.length === 0) return res.json(buildResult(new Map()))
+      const rows = await db.select()
+        .from(puntuacionJornada)
+        .where(and(eq(puntuacionJornada.jornadaId, jornadaRow.id), inArray(puntuacionJornada.miembroLigaId, miembroIds)))
+      return res.json(buildResult(new Map(rows.map(r => [r.miembroLigaId, r.puntos]))))
+    }
+
+    if (modo === 'acumulado') {
+      const jornadaIds = jornadasDivision.filter(j => j.numJornada <= numJornada).map(j => j.id)
+      if (jornadaIds.length === 0 || miembroIds.length === 0) return res.json(buildResult(new Map()))
+      const acum = await db
+        .select({ miembroLigaId: puntuacionJornada.miembroLigaId, puntos: sum(puntuacionJornada.puntos) })
+        .from(puntuacionJornada)
+        .where(and(inArray(puntuacionJornada.miembroLigaId, miembroIds), inArray(puntuacionJornada.jornadaId, jornadaIds)))
+        .groupBy(puntuacionJornada.miembroLigaId)
+      return res.json(buildResult(new Map(acum.map(a => [a.miembroLigaId, Number(a.puntos ?? 0)]))))
+    }
+
+    res.status(400).json({ error: 'modo no reconocido (total|jornada|acumulado)' })
+  } catch (e) {
+    console.error('[getClasificacion]', e)
+    res.status(500).json({ error: 'Error al obtener clasificación' })
   }
 }

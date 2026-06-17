@@ -1,0 +1,411 @@
+{
+  "jornada": "TEST",
+  "url": "https://www.lapreferente.com/P4460203C23556/2025-2026/club-portugalete-vs-deportivo-alaves",
+  "equipos": [
+    {
+      "equipo": "CLUB PORTUGALETE",
+      "jugadores": [
+        {
+          "nombre": "Ibón González",
+          "nombre_completo": "Ibon González Boubeta",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Recio",
+          "nombre_completo": "Iñaki Recio Irusta",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Ander González",
+          "nombre_completo": "Ander González Llaguno",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Gorka Crespo",
+          "nombre_completo": "Gorka Crespo Carvalho",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 81
+        },
+        {
+          "nombre": "Iñaki Bilbao",
+          "nombre_completo": "Iñaki Bilbao San Miguel",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 81,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Del Cura",
+          "nombre_completo": "Oier Del Cura Urra",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90,
+          "tarjetas": [
+            "yellow"
+          ]
+        },
+        {
+          "nombre": "Xabi Gómez",
+          "nombre_completo": "Xabi Gómez Pérez",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 69
+        },
+        {
+          "nombre": "Álex Pérez",
+          "nombre_completo": "Alexander Perez Garitano",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 69,
+          "minuto_salida": 90,
+          "tarjetas": [
+            "yellow"
+          ]
+        },
+        {
+          "nombre": "Yeray Cuello",
+          "nombre_completo": "Yeray Cuello Villaescusa",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 75
+        },
+        {
+          "nombre": "Martín",
+          "nombre_completo": "Martín Fernández de Corres Martínez de Aguirre",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 75,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Gonzalo Alfaro",
+          "nombre_completo": "Gonzalo Alfaro García Del Cerro",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Tapiador",
+          "nombre_completo": "Gorka Tapiador Igartua",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 75
+        },
+        {
+          "nombre": "Andoni Pérez",
+          "nombre_completo": "Andoni Pérez Álvarez",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 75,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Belar",
+          "nombre_completo": "Pedro Belar De Gaminde",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 69
+        },
+        {
+          "nombre": "Lete",
+          "nombre_completo": "Alain Arreitunandía Arrieta",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 69,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Llamazares",
+          "nombre_completo": "Iker Llamazares García",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Artola",
+          "nombre_completo": "Iurgi Artola Guezalaga",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Ibai Quintana",
+          "nombre_completo": "Ibai Quintana Paredes",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Alain",
+          "nombre_completo": "Alain Velarde Tejedor",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Unai Garcés",
+          "nombre_completo": "Unai Garcés Giraldo",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Aranburu",
+          "nombre_completo": "Imanol Aranburu Randez",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Mikel Ortiz",
+          "nombre_completo": "Mikel Ortiz De Urbina Madrazo",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        }
+      ]
+    },
+    {
+      "equipo": "DEPORTIVO ALAVÉS",
+      "jugadores": [
+        {
+          "nombre": "Raúl Fernández",
+          "nombre_completo": "Raúl  Fernández-Cavada Mateos",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Yusi",
+          "nombre_completo": "Youssef Enriquez Lekhedim",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 88,
+          "tarjetas": [
+            "yellow"
+          ]
+        },
+        {
+          "nombre": "Xanet",
+          "nombre_completo": "Xanet Oláiz Ibarzábal",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 88,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Guevara",
+          "nombre_completo": "Ander Guevara Lajo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 62
+        },
+        {
+          "nombre": "Antonio Blanco",
+          "nombre_completo": "Antonio Blanco Conde",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 62,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Carlos Vicente",
+          "nombre_completo": "Carlos Vicente Robles",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Mariano",
+          "nombre_completo": "Mariano Díaz Mejías",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 62,
+          "tarjetas": [
+            "yellow"
+          ]
+        },
+        {
+          "nombre": "Aitor Mañas",
+          "nombre_completo": "Aitor Mañas Buenadicha",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 62,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Aleñá",
+          "nombre_completo": "Carles Aleñá Castillo",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 84
+        },
+        {
+          "nombre": "Izei",
+          "nombre_completo": "Izei Hernández Cañas",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 84,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Toni Martínez",
+          "nombre_completo": "Antonio Martínez López",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Guridi",
+          "nombre_completo": "Jon Guridi Aldalur",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 62,
+          "tarjetas": [
+            "yellow"
+          ]
+        },
+        {
+          "nombre": "Pablo Ibáñez",
+          "nombre_completo": "Pablo Ibáñez Lumbreras",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": 62,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Diarra",
+          "nombre_completo": "Moussa Diarra",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Protesoni",
+          "nombre_completo": "Carlos Nahuel Benavídez Protesoni",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Egoitz",
+          "nombre_completo": "Egoitz Muñoz Larrea",
+          "titular": true,
+          "convocado": true,
+          "minuto_entrada": 0,
+          "minuto_salida": 90
+        },
+        {
+          "nombre": "Sivera",
+          "nombre_completo": "Antonio Sivera Salvá",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Denis Suárez",
+          "nombre_completo": "Denis Suárez Fernández",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Tenaglia",
+          "nombre_completo": "Facundo Nahuel Tenaglia",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Lucas Boyé",
+          "nombre_completo": "Lucas Ariel Boyé",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Abde Rebbach",
+          "nombre_completo": "Abderrahmane Rebbach",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        },
+        {
+          "nombre": "Álvaro García",
+          "nombre_completo": "Álvaro García Blanes",
+          "titular": false,
+          "convocado": true,
+          "minuto_entrada": null,
+          "minuto_salida": null
+        }
+      ]
+    }
+  ],
+  "goles": [
+    {
+      "equipo": "DEPORTIVO ALAVÉS",
+      "goles": [
+        {
+          "jugador": "Carlos Vicente",
+          "jugador_completo": "Carlos Vicente Robles",
+          "minuto": 2,
+          "es_penalty": false,
+          "es_propia_meta": false
+        },
+        {
+          "jugador": "Tapiador",
+          "jugador_completo": "Gorka Tapiador Igartua",
+          "minuto": 71,
+          "es_penalty": false,
+          "es_propia_meta": true
+        },
+        {
+          "jugador": "Toni Martínez",
+          "jugador_completo": "Antonio Martínez López",
+          "minuto": 91,
+          "es_penalty": false,
+          "es_propia_meta": false
+        }
+      ]
+    }
+  ]
+}

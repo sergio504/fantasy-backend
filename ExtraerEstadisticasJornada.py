@@ -1,132 +1,347 @@
 import asyncio
 import re
 import json
+import subprocess
+import os
+import argparse
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 
 URL = "https://www.lapreferente.com/C22283-19/tercera-federacion-grupo-4/calendario.html"
 
+parser = argparse.ArgumentParser(description="Extrae estadísticas de una jornada")
+parser.add_argument("jornada", type=int, help="Número de jornada a extraer (ej: 1)")
+args = parser.parse_args()
+NUM_JORNADA = args.jornada
 
-def extraer_jugadores_tabla(tabla, seccion):
-    """
-    Extrae jugadores de una tabla (titulares o suplentes).
-    seccion: "titulares" | "suplentes"
 
-    Devuelve lista de dicts:
-      { nombre, titular, convocado, minutos, minuto_sustitucion }
-
-    Lógica de minutos en titulares:
-      - Si una fila tiene imgSustitucion en el primer td:
-          ese jugador ENTRÓ (no es titular), jugó 90 - minuto
-          el jugador ANTERIOR salió, jugó minuto minutos
-      - Los titulares que no salen juegan 90
-    Suplentes convocados que no entran: minutos=0
-    """
+def extraer_equipo(tabla):
+    nombre_equipo = "DESCONOCIDO"
     jugadores = []
-    filas = tabla.find_all("tr")
+    seccion_actual = None
+    ultimo_titular_idx = None  # índice del último titular añadido, para actualizar su minuto_salida
 
-    for i, fila in enumerate(filas):
-        tds = fila.find_all("td")
-        if not tds:
+    todos_los_tr = tabla.find_all("tr")
+    print(f"  >> Total <tr>: {len(todos_los_tr)}")
+
+    for idx, tr in enumerate(todos_los_tr):
+        th = tr.find("th")
+        if th:
+            texto_th = th.get_text(strip=True)
+            print(f"    [tr {idx}] th: '{texto_th}'")
+            if re.search(r"CUERPO.TÉCNICO", texto_th, re.IGNORECASE):
+                print(f"    [tr {idx}] -> CUERPO TÉCNICO — fin")
+                break
+            elif re.search(r"TITULARES", texto_th, re.IGNORECASE):
+                seccion_actual = "titulares"
+                nombre_equipo = re.sub(r"^TITULARES\s*", "", texto_th, flags=re.IGNORECASE).strip()
+                print(f"    [tr {idx}] -> TITULARES. Equipo: '{nombre_equipo}'")
+            elif re.search(r"SUPLENTES", texto_th, re.IGNORECASE):
+                seccion_actual = "suplentes"
+                print(f"    [tr {idx}] -> SUPLENTES")
             continue
 
-        # Primer td: puede tener imgSustitucion
-        img_sust = tds[0].find("img", id="imgSustitucion")
+        tds = tr.find_all("td")
+        if not tds or seccion_actual is None:
+            continue
 
-        # Nombre: buscar el td con texto más largo que no sea solo números/iconos
-        nombre = None
-        for td in tds:
-            texto = td.get_text(separator=" ", strip=True)
-            # Ignorar tds con solo números o vacíos
-            if texto and not re.fullmatch(r"[\d\s]+", texto):
-                # Limpiar posibles iconos de Material Symbols
-                texto = re.sub(r"\b(schedule|get_app|sports_soccer|square|circle)\b", "", texto).strip()
-                if texto:
-                    nombre = texto
-                    break
+        td_nombre = tr.find("td", id="tdJugadorAlineado")
+        if not td_nombre:
+            continue
+
+        # Nombre corto y nombre completo desde los dos span dentro del <a>
+        spans = td_nombre.find("a").find_all("span") if td_nombre.find("a") else []
+        if len(spans) >= 2:
+            nombre = spans[0].get_text(strip=True)
+            nombre_completo = spans[1].get_text(strip=True)
+        elif len(spans) == 1:
+            nombre = spans[0].get_text(strip=True)
+            nombre_completo = nombre
+        else:
+            nombre = td_nombre.get_text(strip=True)
+            nombre_completo = nombre
 
         if not nombre:
             continue
 
-        if seccion == "titulares":
-            if img_sust:
-                # Este jugador ENTRÓ como sustituto
-                title = img_sust.get("title", "")
-                m = re.search(r"(\d+)", title)
-                minuto = int(m.group(1)) if m else None
+        img = tr.find("img", id="imgSustitucion")
 
+        if seccion_actual == "titulares":
+            if img:
+                # Sustituto que entró: calculamos su minuto de entrada
+                minuto = None
+                m = re.search(r"(\d+)", img.get("title", ""))
+                if m:
+                    minuto = int(m.group(1))
+
+                # El titular que salió en ese minuto es el último que añadimos
+                if ultimo_titular_idx is not None:
+                    jugadores[ultimo_titular_idx]["minuto_salida"] = minuto
+                    ultimo_titular_idx = None
+
+                print(f"    [tr {idx}] -> ENTRA min {minuto}: '{nombre}'")
                 jugadores.append({
                     "nombre": nombre,
-                    "convocado": True,
+                    "nombre_completo": nombre_completo,
                     "titular": False,
-                    "minutos": (90 - minuto) if minuto is not None else None,
-                    "minuto_sustitucion": minuto,
+                    "convocado": True,
+                    "minuto_entrada": minuto,
+                    "minuto_salida": 90,
                 })
-
-                # El jugador anterior (el que salió) ajustar sus minutos
-                if jugadores and minuto is not None:
-                    # Buscar hacia atrás el último jugador que aún tiene 90 min (el que salió)
-                    for prev in reversed(jugadores[:-1]):
-                        if prev["titular"] and prev["minutos"] == 90:
-                            prev["minutos"] = minuto
-                            prev["minuto_sustitucion"] = minuto
-                            break
             else:
+                print(f"    [tr {idx}] -> TITULAR: '{nombre}'")
                 jugadores.append({
                     "nombre": nombre,
-                    "convocado": True,
+                    "nombre_completo": nombre_completo,
                     "titular": True,
-                    "minutos": 90,
-                    "minuto_sustitucion": None,
+                    "convocado": True,
+                    "minuto_entrada": 0,
+                    "minuto_salida": 90,  # se actualizará si es sustituido
                 })
-        else:  # suplentes
-            jugadores.append({
-                "nombre": nombre,
-                "convocado": True,
-                "titular": False,
-                "minutos": 0,
-                "minuto_sustitucion": None,
-            })
+                ultimo_titular_idx = len(jugadores) - 1
 
-    return jugadores
+        elif seccion_actual == "suplentes":
+            nombres_ya = {j["nombre_completo"] for j in jugadores}
+            if nombre_completo in nombres_ya:
+                print(f"    [tr {idx}] -> Ya entró al partido, ignorando: '{nombre}'")
+            else:
+                print(f"    [tr {idx}] -> SUPLENTE (no jugó): '{nombre}'")
+                jugadores.append({
+                    "nombre": nombre,
+                    "nombre_completo": nombre_completo,
+                    "titular": False,
+                    "convocado": True,
+                    "minuto_entrada": None,
+                    "minuto_salida": None,
+                })
+
+    print(f"  >> Total jugadores: {len(jugadores)}")
+    return nombre_equipo, jugadores
 
 
 def extraer_alineaciones(html_div):
     soup = BeautifulSoup(html_div, "html.parser")
+    tablas = soup.find_all("table", id=re.compile(r"^tableAlineados"))
+    print(f"\n[ALINEACIONES] Tablas encontradas: {len(tablas)}")
 
-    # Buscar todas las tablas del div — normalmente hay 2, una por equipo
-    tablas = soup.find_all("table")
+    if not tablas:
+        todas = soup.find_all("table")
+        print(f"[ALINEACIONES] Todas las tablas ({len(todas)}):")
+        for t in todas:
+            print(f"  id='{t.get('id', '')}' class='{t.get('class', '')}'")
 
-    resultado = {}
-    equipo_idx = 0
-    equipo_nombres = ["local", "visitante"]
+    equipos = []
+    for i, tabla in enumerate(tablas):
+        print(f"\n[ALINEACIONES] Tabla {i+1}: id='{tabla.get('id')}'")
+        nombre_equipo, jugadores = extraer_equipo(tabla)
+        equipos.append({"equipo": nombre_equipo, "jugadores": jugadores})
 
-    i = 0
-    while i < len(tablas) and equipo_idx < 2:
-        tabla = tablas[i]
-        texto_cabecera = tabla.get_text(" ", strip=True).lower()
+    return equipos
 
-        # Intentar detectar si es tabla de titulares o suplentes por th/caption/texto
-        # Puede que estén agrupadas de otra forma — ajustar según HTML real
-        # Por ahora asumimos estructura: tabla titulares seguida de tabla suplentes por equipo
 
-        jugadores_equipo = []
+def extraer_goles(html_div):
+    soup = BeautifulSoup(html_div, "html.parser")
+    tablas = soup.find_all("table", class_="datosPartido")
+    print(f"\n[GOLES] Tablas encontradas: {len(tablas)}")
 
-        # Titulares
-        jugadores_equipo += extraer_jugadores_tabla(tabla, "titulares")
-        # Suplentes: tabla siguiente si existe
-        if i + 1 < len(tablas):
-            siguiente = tablas[i + 1]
-            sups = extraer_jugadores_tabla(siguiente, "suplentes")
-            if sups:
-                jugadores_equipo += sups
-                i += 1  # consumir también la de suplentes
+    goles_equipos = []
 
-        resultado[equipo_nombres[equipo_idx]] = jugadores_equipo
-        equipo_idx += 1
-        i += 1
+    for i, tabla in enumerate(tablas):
+        th = tabla.find("th")
+        if not th:
+            continue
+        texto_th = th.get_text(strip=True)
+        nombre_equipo = re.sub(r"^GOLEADORES\s*", "", texto_th, flags=re.IGNORECASE).strip()
+        print(f"\n[GOLES] Equipo {i+1}: '{nombre_equipo}'")
 
-    return resultado
+        goles = []
+        for tr in tabla.find_all("tr"):
+            td_jugador = tr.find("td", id="tdJugadorAlineado")
+            td_resultado = tr.find("td", id="tdResultadoParcial")
+            if not td_jugador or not td_resultado:
+                continue
+
+            spans = td_jugador.find("a").find_all("span") if td_jugador.find("a") else []
+            if len(spans) >= 2:
+                nombre = spans[0].get_text(strip=True)
+                nombre_completo = spans[1].get_text(strip=True)
+            elif len(spans) == 1:
+                nombre = spans[0].get_text(strip=True)
+                nombre_completo = nombre
+            else:
+                nombre = td_jugador.get_text(strip=True)
+                nombre_completo = nombre
+
+            # El minuto está en el segundo <p> del td, formato 'min. 45'
+            parrafos = td_resultado.find_all("p")
+            minuto = None
+            if len(parrafos) >= 2:
+                m = re.search(r"(\d+)", parrafos[1].get_text(strip=True))
+                if m:
+                    minuto = int(m.group(1))
+
+            # Detectar tipo de gol por el título de la imagen en tdJugadorAlineado
+            imgs = td_jugador.find_all("img")
+            es_penalty = any(re.search(r"penalti", i.get("title", ""), re.IGNORECASE) for i in imgs)
+            es_propia = any(re.search(r"propia meta", i.get("title", ""), re.IGNORECASE) for i in imgs)
+
+            tipo = " [PENALTY]" if es_penalty else (" [PROPIA META]" if es_propia else "")
+            print(f"  Gol: '{nombre}' min {minuto}{tipo}")
+            goles.append({
+                "jugador": nombre,
+                "jugador_completo": nombre_completo,
+                "minuto": minuto,
+                "es_penalty": es_penalty,
+                "es_propia_meta": es_propia,
+            })
+
+        goles_equipos.append({"equipo": nombre_equipo, "goles": goles})
+
+    return goles_equipos
+
+
+def extraer_tarjetas(html_div, equipos):
+    """
+    Lee divTarjetasPartido y añade tarjetas a los jugadores que ya están en equipos.
+    Ignora tarjetas de cuerpo técnico (su nombre no estará en la lista de jugadores).
+    """
+    soup = BeautifulSoup(html_div, "html.parser")
+    tablas = [t for t in soup.find_all("table", class_="datosPartido") if t.get("id") != "tableArbitroPartido"]
+    print(f"\n[TARJETAS] Tablas encontradas: {len(tablas)}")
+
+    # Índice rápido: nombre_completo -> jugador, por equipo
+    indices = []
+    for equipo_data in equipos:
+        idx = {j["nombre_completo"]: j for j in equipo_data["jugadores"]}
+        indices.append(idx)
+
+    for i, tabla in enumerate(tablas):
+        th = tabla.find("th")
+        if not th:
+            continue
+        texto_th = th.get_text(strip=True)
+        nombre_equipo = re.sub(r"^TARJETAS\s*", "", texto_th, flags=re.IGNORECASE).strip()
+        print(f"\n[TARJETAS] Equipo {i+1}: '{nombre_equipo}'")
+
+        indice_equipo = indices[i] if i < len(indices) else {}
+
+        for tr in tabla.find_all("tr"):
+            td_jugador = tr.find("td", id=re.compile(r"jugadorAlineado", re.IGNORECASE))
+            td_tarjeta = tr.find("td", id="tdDatosTarjeta")
+            if not td_jugador or not td_tarjeta:
+                continue
+
+            spans = td_jugador.find("a").find_all("span") if td_jugador.find("a") else []
+            if len(spans) >= 2:
+                nombre_completo = spans[1].get_text(strip=True)
+                nombre = spans[0].get_text(strip=True)
+            elif len(spans) == 1:
+                nombre = spans[0].get_text(strip=True)
+                nombre_completo = nombre
+            else:
+                nombre = td_jugador.get_text(strip=True)
+                nombre_completo = nombre
+
+            # Color de tarjeta desde el src de la imagen
+            img = td_tarjeta.find("img")
+            color = None
+            if img:
+                src = img.get("src", "").lower()
+                if "yellow" in src:
+                    color = "yellow"
+                elif "red" in src:
+                    color = "red"
+
+            print(f"  Tarjeta {color}: '{nombre}'", end="")
+
+            # Solo añadir si el jugador está en la plantilla (no cuerpo técnico)
+            jugador = indice_equipo.get(nombre_completo)
+            if jugador:
+                jugador.setdefault("tarjetas", []).append(color)
+                print(f" -> añadida")
+            else:
+                print(f" -> no es jugador, ignorado")
+
+
+def calcular_goles_jugadores(equipos, goles_equipos):
+    """
+    Para cada jugador añade goles_a_favor y goles_en_contra:
+    solo cuentan los goles marcados mientras estaba en el campo.
+    Los suplentes que no jugaron reciben None.
+    """
+    for i, equipo_data in enumerate(equipos):
+        goles_favor = goles_equipos[i]["goles"] if i < len(goles_equipos) else []
+        goles_contra = goles_equipos[1 - i]["goles"] if (1 - i) < len(goles_equipos) else []
+
+        for jugador in equipo_data["jugadores"]:
+            # Suplente que no pisó el campo
+            if jugador["minuto_entrada"] is None:
+                jugador["goles_a_favor"] = None
+                jugador["goles_en_contra"] = None
+                continue
+
+            entrada = jugador["minuto_entrada"]
+            salida = jugador["minuto_salida"] or 90
+
+            jugador["goles_a_favor"] = sum(
+                1 for g in goles_favor
+                if g["minuto"] is not None and entrada <= g["minuto"] <= salida
+            )
+            jugador["goles_en_contra"] = sum(
+                1 for g in goles_contra
+                if g["minuto"] is not None and entrada <= g["minuto"] <= salida
+            )
+
+
+async def procesar_partido(page, url, idx):
+    print(f"\n{'='*60}")
+    print(f"[Partido {idx}] Cargando {url}")
+    await page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+    print(f"[Partido {idx}] Cargado: {await page.title()}")
+
+    # Alineaciones
+    alin_loc = page.locator("#divAlineacionesPartido")
+    if await alin_loc.count() == 0:
+        print(f"[Partido {idx}] Sin #divAlineacionesPartido — saltando")
+        return None
+    equipos = extraer_alineaciones(await alin_loc.first.inner_html())
+
+    # Goles
+    goles_equipos = []
+    goles_loc = page.locator("#divGoleadoresPartido")
+    if await goles_loc.count() > 0:
+        goles_equipos = extraer_goles(await goles_loc.first.inner_html())
+
+    if goles_equipos and len(goles_equipos) == len(equipos):
+        calcular_goles_jugadores(equipos, goles_equipos)
+
+    # Tarjetas
+    tarj_loc = page.locator("#divTarjetasPartido")
+    if await tarj_loc.count() > 0:
+        extraer_tarjetas(await tarj_loc.first.inner_html(), equipos)
+
+    # Resumen por consola
+    for equipo in equipos:
+        print(f"\n  === {equipo['equipo']} ===")
+        for j in equipo["jugadores"]:
+            if j["minuto_entrada"] is None:
+                estado = "SUP"
+            elif j["titular"]:
+                estado = f"TIT->sal.{j['minuto_salida']}'"
+            else:
+                estado = f"ENT {j['minuto_entrada']}'"
+            gf = j.get("goles_a_favor")
+            gc = j.get("goles_en_contra")
+            tarj = j.get("tarjetas", [])
+            extra = f"  [GF:{gf} GC:{gc}]" if gf is not None else ""
+            extra += f"  {tarj}" if tarj else ""
+            print(f"    [{estado}] {j['nombre']:25s}{extra}")
+
+    return {
+        "url": url,
+        "equipos": equipos,
+        "goles": [{"equipo": g["equipo"], "goles": g["goles"]} for g in goles_equipos],
+    }
 
 
 async def main():
@@ -134,15 +349,17 @@ async def main():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
 
-        print(f"Conectando a {URL} ...")
+        print(f"[1] Conectando a {URL} ...")
         await page.goto(URL, wait_until="domcontentloaded", timeout=60_000)
+        print(f"[1] Cargada.")
 
-        # Obtener URL del primer partido de la primera jornada
         flex_divs = page.locator("#calendarContainer div[style*='display:flex']")
         count = await flex_divs.count()
+        print(f"[2] Divs flex en calendario: {count}")
 
-        first_match_url = None
-        first_jornada = None
+        # Recoger todas las URLs de la jornada solicitada
+        urls_jornada = []
+        nombre_jornada = None
 
         for i in range(count):
             hijos = flex_divs.nth(i).locator("> div")
@@ -151,67 +368,66 @@ async def main():
                 th = hijos.nth(j).locator("table tr:first-child th")
                 if await th.count() == 0:
                     continue
+
                 texto_th = (await th.first.inner_text()).strip()
                 texto_th = texto_th.replace("schedule", "").replace("get_app", "").strip()
 
-                filas = hijos.nth(j).locator("tr#filaPartido")
-                if await filas.count() == 0:
+                # Comprobar si este bloque corresponde a la jornada pedida
+                m_num = re.search(r"JORNADA\s+(\d+)", texto_th, re.IGNORECASE)
+                if not m_num or int(m_num.group(1)) != NUM_JORNADA:
                     continue
 
-                onclick = await filas.nth(0).get_attribute("onclick")
-                m = re.search(r"window\.location='([^']+)'", onclick or "")
-                if m:
-                    first_match_url = f"https://www.lapreferente.com/{m.group(1)}"
-                    first_jornada = texto_th
-                    break
-            if first_match_url:
-                break
+                nombre_jornada = texto_th
+                filas = hijos.nth(j).locator("tr#filaPartido")
+                num_filas = await filas.count()
+                for k in range(num_filas):
+                    onclick = await filas.nth(k).get_attribute("onclick")
+                    m = re.search(r"window\.location='([^']+)'", onclick or "")
+                    if m:
+                        urls_jornada.append(f"https://www.lapreferente.com/{m.group(1)}")
 
-        if not first_match_url:
-            print("No se encontró ningún partido.")
+        print(f"[2] Jornada: '{nombre_jornada}' — {len(urls_jornada)} partidos encontrados")
+        for u in urls_jornada:
+            print(f"    {u}")
+
+        if not urls_jornada:
+            print(f"[!] No se encontraron partidos para la jornada {NUM_JORNADA}.")
             await browser.close()
             return
 
-        print(f"Jornada: {first_jornada}")
-        print(f"URL:     {first_match_url}\n")
+        # Procesar cada partido
+        partidos = []
+        for idx, url in enumerate(urls_jornada, 1):
+            resultado = await procesar_partido(page, url, idx)
+            if resultado:
+                partidos.append(resultado)
 
-        await page.goto(first_match_url, wait_until="domcontentloaded", timeout=60_000)
-
-        # --- DEBUG: volcar HTML crudo de divAlineacionesPartido ---
-        alin_loc = page.locator("#divAlineacionesPartido")
-        if await alin_loc.count() == 0:
-            print("No se encontró #divAlineacionesPartido")
-            await browser.close()
-            return
-
-        html_div = await alin_loc.first.inner_html()
-
-        with open("debug_alineaciones.html", "w", encoding="utf-8") as f:
-            f.write(html_div)
-        print("HTML de alineaciones guardado en debug_alineaciones.html\n")
-
-        # --- Parsear alineaciones ---
-        alineaciones = extraer_alineaciones(html_div)
-
-        for equipo, jugadores in alineaciones.items():
-            print(f"=== {equipo.upper()} ({len(jugadores)} jugadores) ===")
-            for j in jugadores:
-                estado = "TIT" if j["titular"] else ("ENT" if j["minutos"] else "SUP")
-                print(f"  [{estado}] {j['nombre']:30s}  {j['minutos']} min")
-            print()
-
-        # Guardar en JSON
+        # Guardar JSON
         salida = {
-            "jornada": first_jornada,
-            "url": first_match_url,
-            "alineaciones": alineaciones,
+            "jornada": nombre_jornada,
+            "partidos": partidos,
         }
-        with open("jornada_1_partido_1.json", "w", encoding="utf-8") as f:
+        json_filename = f"jornada_{NUM_JORNADA}.json"
+        json_path = os.path.join(os.path.dirname(__file__), json_filename)
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(salida, f, ensure_ascii=False, indent=2)
-
-        print("Resultado guardado en jornada_1_partido_1.json")
+        print(f"\n[FIN] {len(partidos)} partidos guardados en {json_filename}")
 
         await browser.close()
+
+    # Llamar al importador TypeScript una vez cerrado el browser
+    print(f"\n[IMPORT] Lanzando importar-jornada.ts ...")
+    backend_dir = os.path.dirname(__file__)
+    resultado = subprocess.run(
+        f"npx tsx prisma/importar-jornada.ts {NUM_JORNADA}",
+        cwd=backend_dir,
+        text=True,
+        shell=True,
+    )
+    if resultado.returncode == 0:
+        print("[IMPORT] Importación completada correctamente.")
+    else:
+        print(f"[IMPORT] Error en la importación (código {resultado.returncode}).")
 
 
 asyncio.run(main())

@@ -1,5 +1,5 @@
 import {
-  mysqlTable, varchar, int, boolean, datetime, json, mysqlEnum, uniqueIndex, index,
+  mysqlTable, varchar, int, boolean, datetime, json, mysqlEnum, uniqueIndex, index, text,
 } from 'drizzle-orm/mysql-core'
 import { relations } from 'drizzle-orm'
 
@@ -14,9 +14,12 @@ export const tipoAccionAdminValues = [
   'SIMULAR_JORNADA', 'CALCULAR_PUNTUACIONES',
 ] as const
 export const accionPuntuacionValues = [
-  'CONVOCADO', 'TITULAR', 'MINUTOS_60', 'GOL', 'TARJETA_AMARILLA', 'TARJETA_ROJA',
+  'CONVOCADO', 'JUEGA', 'TITULAR', 'MINUTOS_60',
+  'GOL', 'GOL_PENALTY', 'GOL_PROPIA',
+  'GOL_A_FAVOR', 'GOL_ENCAJADO',
   'VICTORIA', 'EMPATE', 'DERROTA',
-  'GOL_ENCAJADO', 'GOL_A_FAVOR', 'GOL_PROPIA', 'DIFERENCIA_GOLES',
+  'GOLEADA_FAVOR', 'GOLEADA_CONTRA',
+  'TARJETA_AMARILLA', 'DOBLE_AMARILLA', 'TARJETA_ROJA',
 ] as const
 export const resultadoPartidoValues = ['VICTORIA', 'EMPATE', 'DERROTA'] as const
 
@@ -97,14 +100,28 @@ export const jugadorEquipo = mysqlTable('jugadorEquipo', {
 }))
 
 export const plantillaFantasy = mysqlTable('plantillaFantasy', {
-  id:            varchar('id', { length: 36 }).primaryKey(),
-  ligaId:        varchar('ligaId', { length: 36 }).notNull(),
-  miembroLigaId: varchar('miembroLigaId', { length: 36 }).notNull(),
-  jugadorId:     varchar('jugadorId', { length: 36 }).notNull(),
-  precioCompra:  int('precioCompra').notNull(),
-  creadoEn:      datetime('creadoEn').notNull(),
+  id:              varchar('id', { length: 36 }).primaryKey(),
+  ligaId:          varchar('ligaId', { length: 36 }).notNull(),
+  miembroLigaId:   varchar('miembroLigaId', { length: 36 }).notNull(),
+  jugadorId:       varchar('jugadorId', { length: 36 }).notNull(),
+  precioCompra:    int('precioCompra').notNull(),
+  clausula:        int('clausula').notNull().default(0),
+  jornadasBloqueo: int('jornadasBloqueo').notNull().default(3),
+  creadoEn:        datetime('creadoEn').notNull(),
 }, t => ({
   ligaJugadorUniq: uniqueIndex('pf_liga_jugador').on(t.ligaId, t.jugadorId),
+}))
+
+export const clausulazoPendiente = mysqlTable('clausulazoPendiente', {
+  id:                 varchar('id', { length: 36 }).primaryKey(),
+  ligaId:             varchar('ligaId', { length: 36 }).notNull(),
+  jugadorId:          varchar('jugadorId', { length: 36 }).notNull(),
+  compradorMiembroId: varchar('compradorMiembroId', { length: 36 }).notNull(),
+  vendedorMiembroId:  varchar('vendedorMiembroId', { length: 36 }).notNull(),
+  importe:            int('importe').notNull(),
+  creadoEn:           datetime('creadoEn').notNull(),
+}, t => ({
+  ligaJugadorUniq: uniqueIndex('cp_liga_jugador').on(t.ligaId, t.jugadorId),
 }))
 
 export const titularLiga = mysqlTable('titularLiga', {
@@ -148,10 +165,15 @@ export const historialAdmin = mysqlTable('historialAdmin', {
 })
 
 export const jornada = mysqlTable('jornada', {
-  id:          varchar('id', { length: 36 }).primaryKey(),
-  division:    mysqlEnum('division', divisionValues).notNull(),
-  numJornada:  int('numJornada').notNull(),
-  fechaCierre: datetime('fechaCierre').notNull(),
+  id:                        varchar('id', { length: 36 }).primaryKey(),
+  division:                  mysqlEnum('division', divisionValues).notNull(),
+  numJornada:                int('numJornada').notNull(),
+  fechaCierre:               datetime('fechaCierre').notNull(),
+  fechaImportacion:          datetime('fechaImportacion'),
+  snapshotGenerado:          boolean('snapshotGenerado').notNull().default(false),
+  statsImportadas:           boolean('statsImportadas').notNull().default(false),
+  puntosPorJugadorCalculados: boolean('puntosPorJugadorCalculados').notNull().default(false),
+  puntuacionesCalculadas:    boolean('puntuacionesCalculadas').notNull().default(false),
 }, t => ({
   divisionJornadaUniq: uniqueIndex('j_division_num').on(t.division, t.numJornada),
 }))
@@ -178,6 +200,135 @@ export const transferencia = mysqlTable('transferencia', {
   fecha:       datetime('fecha').notNull(),
 })
 
+export const aliasEquipo = mysqlTable('aliasEquipo', {
+  id:       varchar('id', { length: 36 }).primaryKey(),
+  equipoId: varchar('equipoId', { length: 36 }).notNull(),
+  alias:    varchar('alias', { length: 255 }).notNull().unique(),
+})
+
+export const aliasJugador = mysqlTable('aliasJugador', {
+  id:        varchar('id', { length: 36 }).primaryKey(),
+  jugadorId: varchar('jugadorId', { length: 36 }).notNull(),
+  alias:     varchar('alias', { length: 255 }).notNull().unique(),
+})
+
+export const motivoPenalizacionValues = ['SALDO_NEGATIVO', 'ALINEACION_INCOMPLETA'] as const
+export type MotivoPenalizacion = typeof motivoPenalizacionValues[number]
+
+export const penalizacionJornada = mysqlTable('penalizacionJornada', {
+  id:            varchar('id', { length: 36 }).primaryKey(),
+  jornadaId:     varchar('jornadaId', { length: 36 }).notNull(),
+  miembroLigaId: varchar('miembroLigaId', { length: 36 }).notNull(),
+  motivo:        mysqlEnum('motivo', motivoPenalizacionValues).notNull(),
+}, t => ({
+  uniq: uniqueIndex('pj_jornada_miembro_pen').on(t.jornadaId, t.miembroLigaId),
+}))
+
+export const estadisticaJornadaSinRegistrar = mysqlTable('estadisticaJornadaSinRegistrar', {
+  id:                    varchar('id', { length: 36 }).primaryKey(),
+  jornadaId:             varchar('jornadaId', { length: 36 }).notNull(),
+  equipoId:              varchar('equipoId', { length: 36 }),
+  nombreEquipoScraper:   varchar('nombreEquipoScraper', { length: 255 }).notNull(),
+  nombreJugadorScraper:  varchar('nombreJugadorScraper', { length: 255 }).notNull(),
+  nombreCompletoScraper: varchar('nombreCompletoScraper', { length: 255 }).notNull(),
+  convocado:             boolean('convocado').notNull().default(false),
+  titular:               boolean('titular').notNull().default(false),
+  minutosJugados:        int('minutosJugados').notNull().default(0),
+  goles:                 int('goles').notNull().default(0),
+  golesDePenalti:        int('golesDePenalti').notNull().default(0),
+  tarjetasAmarillas:     int('tarjetasAmarillas').notNull().default(0),
+  tarjetaRoja:           boolean('tarjetaRoja').notNull().default(false),
+  resultado:             mysqlEnum('resultado', resultadoPartidoValues).notNull().default('DERROTA'),
+  golesEncajados:        int('golesEncajados').notNull().default(0),
+  golesAFavor:           int('golesAFavor').notNull().default(0),
+  golEnPropia:           int('golEnPropia').notNull().default(0),
+  diferenciaGoles:       int('diferenciaGoles').notNull().default(0),
+  creadoEn:              datetime('creadoEn').notNull(),
+})
+
+export const configEconomia = mysqlTable('configEconomia', {
+  id:          varchar('id', { length: 36 }).primaryKey(),
+  clave:       varchar('clave', { length: 50 }).notNull().unique(),
+  valor:       int('valor').notNull(),
+  descripcion: varchar('descripcion', { length: 255 }),
+})
+
+export const configRevalorizacion = mysqlTable('configRevalorizacion', {
+  id:           varchar('id', { length: 36 }).primaryKey(),
+  puntosHasta:  int('puntosHasta'),
+  porcentaje:   int('porcentaje').notNull(),
+  orden:        int('orden').notNull(),
+  descripcion:  varchar('descripcion', { length: 255 }),
+})
+
+export const conceptoSaldoValues = [
+  'PRESUPUESTO_INICIAL', 'COMPRA_MERCADO', 'VENTA_MERCADO',
+  'VENTA_RAPIDA', 'CLAUSULAZO_PAGO', 'CLAUSULAZO_COBRO', 'INVERSION_CLAUSULA',
+] as const
+export type ConceptoSaldo = typeof conceptoSaldoValues[number]
+
+export const motivoClausulaValues = [
+  'ADQUISICION', 'INVERSION', 'CLAUSULAZO_NUEVO_DUENO',
+] as const
+export type MotivoClausula = typeof motivoClausulaValues[number]
+
+export const tipoHistorialConfigValues = [
+  'PUNTUACION', 'ECONOMIA', 'REVALORIZACION',
+] as const
+export type TipoHistorialConfig = typeof tipoHistorialConfigValues[number]
+
+export const historialSaldo = mysqlTable('historialSaldo', {
+  id:              varchar('id', { length: 36 }).primaryKey(),
+  miembroLigaId:   varchar('miembroLigaId', { length: 36 }).notNull(),
+  ligaId:          varchar('ligaId', { length: 36 }).notNull(),
+  concepto:        mysqlEnum('concepto', conceptoSaldoValues).notNull(),
+  importe:         int('importe').notNull(),
+  saldoResultante: int('saldoResultante').notNull(),
+  descripcion:     varchar('descripcion', { length: 200 }),
+  jugadorId:       varchar('jugadorId', { length: 36 }),
+  numJornada:      int('numJornada'),
+  creadoEn:        datetime('creadoEn').notNull(),
+}, t => ({
+  miembroIdx: index('hs_miembro').on(t.miembroLigaId),
+  ligaIdx:    index('hs_liga').on(t.ligaId),
+}))
+
+export const historialValorJugador = mysqlTable('historialValorJugador', {
+  id:            varchar('id', { length: 36 }).primaryKey(),
+  jugadorId:     varchar('jugadorId', { length: 36 }).notNull(),
+  valorAnterior: int('valorAnterior').notNull(),
+  valorNuevo:    int('valorNuevo').notNull(),
+  numJornada:    int('numJornada').notNull(),
+  creadoEn:      datetime('creadoEn').notNull(),
+}, t => ({
+  jugadorIdx: index('hvj_jugador').on(t.jugadorId),
+}))
+
+export const historialClausula = mysqlTable('historialClausula', {
+  id:               varchar('id', { length: 36 }).primaryKey(),
+  jugadorId:        varchar('jugadorId', { length: 36 }).notNull(),
+  ligaId:           varchar('ligaId', { length: 36 }).notNull(),
+  miembroLigaId:    varchar('miembroLigaId', { length: 36 }).notNull(),
+  clausulaAnterior: int('clausulaAnterior').notNull(),
+  clausulaNueva:    int('clausulaNueva').notNull(),
+  motivo:           mysqlEnum('motivo', motivoClausulaValues).notNull(),
+  creadoEn:         datetime('creadoEn').notNull(),
+}, t => ({
+  jugadorLigaIdx: index('hc_jugador_liga').on(t.jugadorId, t.ligaId),
+}))
+
+export const historialConfig = mysqlTable('historialConfig', {
+  id:            varchar('id', { length: 36 }).primaryKey(),
+  tipo:          mysqlEnum('tipo', tipoHistorialConfigValues).notNull(),
+  campo:         varchar('campo', { length: 100 }).notNull(),
+  valorAnterior: int('valorAnterior'),
+  valorNuevo:    int('valorNuevo').notNull(),
+  adminId:       varchar('adminId', { length: 36 }).notNull(),
+  creadoEn:      datetime('creadoEn').notNull(),
+}, t => ({
+  tipoIdx: index('hcfg_tipo').on(t.tipo),
+}))
+
 export const configPuntuacion = mysqlTable('configPuntuacion', {
   id:          varchar('id', { length: 36 }).primaryKey(),
   posicion:    mysqlEnum('posicion', posicionValues),
@@ -197,6 +348,7 @@ export const estadisticaJornada = mysqlTable('estadisticaJornada', {
   titular:          boolean('titular').notNull().default(false),
   minutosJugados:   int('minutosJugados').notNull().default(0),
   goles:            int('goles').notNull().default(0),
+  golesDePenalti:   int('golesDePenalti').notNull().default(0),
   tarjetasAmarillas: int('tarjetasAmarillas').notNull().default(0),
   tarjetaRoja:      boolean('tarjetaRoja').notNull().default(false),
   resultado:        mysqlEnum('resultado', resultadoPartidoValues).notNull().default('DERROTA'),
@@ -326,3 +478,31 @@ export const puntuacionJornadaRelations = relations(puntuacionJornada, ({ one })
 }))
 
 export const configPuntuacionRelations = relations(configPuntuacion, () => ({}))
+
+export const aliasEquipoRelations = relations(aliasEquipo, ({ one }) => ({
+  equipo: one(equipo, { fields: [aliasEquipo.equipoId], references: [equipo.id] }),
+}))
+
+export const aliasJugadorRelations = relations(aliasJugador, ({ one }) => ({
+  jugador: one(jugador, { fields: [aliasJugador.jugadorId], references: [jugador.id] }),
+}))
+
+export const historialSaldoRelations = relations(historialSaldo, ({ one }) => ({
+  miembroLiga: one(miembroLiga, { fields: [historialSaldo.miembroLigaId], references: [miembroLiga.id] }),
+  liga:        one(liga,        { fields: [historialSaldo.ligaId],        references: [liga.id] }),
+  jugador:     one(jugador,     { fields: [historialSaldo.jugadorId],     references: [jugador.id] }),
+}))
+
+export const historialValorJugadorRelations = relations(historialValorJugador, ({ one }) => ({
+  jugador: one(jugador, { fields: [historialValorJugador.jugadorId], references: [jugador.id] }),
+}))
+
+export const historialClausulaRelations = relations(historialClausula, ({ one }) => ({
+  jugador:     one(jugador,     { fields: [historialClausula.jugadorId],     references: [jugador.id] }),
+  liga:        one(liga,        { fields: [historialClausula.ligaId],        references: [liga.id] }),
+  miembroLiga: one(miembroLiga, { fields: [historialClausula.miembroLigaId], references: [miembroLiga.id] }),
+}))
+
+export const historialConfigRelations = relations(historialConfig, ({ one }) => ({
+  admin: one(usuario, { fields: [historialConfig.adminId], references: [usuario.id] }),
+}))
