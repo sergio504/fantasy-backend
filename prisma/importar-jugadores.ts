@@ -8,7 +8,7 @@ import * as schema from '../src/db/schema'
 import { Division, Posicion } from '../src/db/schema'
 import dotenv from 'dotenv'
 
-dotenv.config()
+if (!process.env.DATABASE_URL) dotenv.config()
 
 interface JugadorJSON {
   nombreCompleto: string

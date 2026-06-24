@@ -147,8 +147,8 @@ export const simularJornada = async (req: AuthRequest, res: Response) => {
     if (yaSimulada > 0) { res.status(409).json({ error: 'Esta jornada ya tiene estadísticas. Bórralas primero.' }); return }
 
     const config = await db.select().from(configPuntuacion).where(
-      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada),
-          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada)))
+      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada ?? new Date()),
+          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada ?? new Date())))
     )
 
     const jeRaw = await db.select({
@@ -241,8 +241,8 @@ export const calcularPuntosPorJugador = async (req: AuthRequest, res: Response) 
     if (!j) { res.status(404).json({ error: 'Jornada no encontrada' }); return }
 
     const config = await db.select().from(configPuntuacion).where(
-      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada),
-          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada)))
+      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada ?? new Date()),
+          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada ?? new Date())))
     )
 
     const tramosReval = await cargarConfigRevalorizacion()

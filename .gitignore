@@ -1,5 +1,11 @@
-node_modules
-# Keep environment variables out of version control
+node_modules/
+dist/
 .env
-
+.env.local
+.env.production
 /generated/prisma
+Estadisticas/
+debug_*.html
+jornada_*.json
+test_*.py
+ExtraerEstadisticasJornada.ts
