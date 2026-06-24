@@ -249,8 +249,8 @@ export const editarEstadistica = async (req: AuthRequest, res: Response) => {
     }
 
     const config = await db.select().from(configPuntuacion).where(
-      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, antes.jornada.fechaCierre),
-          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, antes.jornada.fechaCierre)))
+      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, antes.jornada.fechaInicioJornada),
+          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, antes.jornada.fechaInicioJornada)))
     )
 
     const { total, desglose } = recalcularPuntos(nuevosDatos, antes.jugadorEquipo.jugador.posicion, config)

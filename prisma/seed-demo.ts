@@ -285,11 +285,11 @@ async function main() {
     { division: 'RFEF2_GRUPO_II' as Division, ligaNombre: 'La Peña 2ª RFEF', numJornadas: 3 },
   ]) {
     for (let n = 1; n <= numJornadas; n++) {
-      const fechaCierre = new Date(hoy)
-      fechaCierre.setDate(hoy.getDate() - (numJornadas - n + 1) * 7) // jornadas pasadas
+      const fechaInicioJornada = new Date(hoy)
+      fechaInicioJornada.setDate(hoy.getDate() - (numJornadas - n + 1) * 7)
 
       const jornada = await prisma.jornada.create({
-        data: { division, numJornada: n, fechaCierre },
+        data: { division, numJornada: n, fechaInicioJornada },
       })
 
       const snapshots = await generarSnapshot(jornada.id, division)

@@ -45,7 +45,7 @@ export const getEstadisticasJugador = async (req: Request, res: Response) => {
         golesEncajados: estadisticaJornada.golesEncajados, golesAFavor: estadisticaJornada.golesAFavor,
         golEnPropia: estadisticaJornada.golEnPropia, diferenciaGoles: estadisticaJornada.diferenciaGoles,
         puntosCalculados: estadisticaJornada.puntosCalculados, desglose: estadisticaJornada.desglose,
-        jornada: { numJornada: jornada.numJornada, division: jornada.division, fechaCierre: jornada.fechaCierre },
+        jornada: { numJornada: jornada.numJornada, division: jornada.division, fechaInicioJornada: jornada.fechaInicioJornada, fechaFinJornada: jornada.fechaFinJornada },
       })
       .from(estadisticaJornada)
       .innerJoin(jornada, eq(jornada.id, estadisticaJornada.jornadaId))

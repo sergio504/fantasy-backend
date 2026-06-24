@@ -67,12 +67,16 @@ function calcularPuntos(stats: StatsParaPuntos, posicion: Posicion, config: { po
 // ─── CREAR JORNADA ─────────────────────────────────
 
 export const crearJornada = async (req: AuthRequest, res: Response) => {
-  const { division, numJornada, fechaCierre } = req.body
-  if (!division || !numJornada || !fechaCierre) { res.status(400).json({ error: 'division, numJornada y fechaCierre son obligatorios' }); return }
+  const { division, numJornada, fechaInicioJornada, fechaFinJornada } = req.body
+  if (!division || !numJornada) { res.status(400).json({ error: 'division y numJornada son obligatorios' }); return }
 
   try {
     const id = randomUUID()
-    await db.insert(jornada).values({ id, division, numJornada, fechaCierre: new Date(fechaCierre) })
+    await db.insert(jornada).values({
+      id, division, numJornada,
+      fechaInicioJornada: fechaInicioJornada ? new Date(fechaInicioJornada) : null,
+      fechaFinJornada:    fechaFinJornada    ? new Date(fechaFinJornada)    : null,
+    })
     const [j] = await db.select().from(jornada).where(eq(jornada.id, id)).limit(1)
     await registrarAccion(req.usuarioId!, 'CREAR_JORNADA', 'Jornada', id, j)
     res.status(201).json(j)
@@ -83,15 +87,16 @@ export const crearJornada = async (req: AuthRequest, res: Response) => {
 
 export const editarJornada = async (req: AuthRequest, res: Response) => {
   const jornadaId = req.params.jornadaId as string
-  const { fechaCierre, fechaImportacion } = req.body
+  const { fechaInicioJornada, fechaFinJornada, fechaImportacion } = req.body
 
   try {
     const [j] = await db.select().from(jornada).where(eq(jornada.id, jornadaId)).limit(1)
     if (!j) { res.status(404).json({ error: 'Jornada no encontrada' }); return }
 
-    const set: { fechaCierre?: Date; fechaImportacion?: Date | null } = {}
-    if (fechaCierre !== undefined)      set.fechaCierre      = new Date(fechaCierre)
-    if (fechaImportacion !== undefined) set.fechaImportacion = fechaImportacion ? new Date(fechaImportacion) : null
+    const set: { fechaInicioJornada?: Date | null; fechaFinJornada?: Date | null; fechaImportacion?: Date | null } = {}
+    if (fechaInicioJornada !== undefined) set.fechaInicioJornada = fechaInicioJornada ? new Date(fechaInicioJornada) : null
+    if (fechaFinJornada    !== undefined) set.fechaFinJornada    = fechaFinJornada    ? new Date(fechaFinJornada)    : null
+    if (fechaImportacion   !== undefined) set.fechaImportacion   = fechaImportacion   ? new Date(fechaImportacion)   : null
 
     if (Object.keys(set).length === 0) { res.status(400).json({ error: 'Nada que actualizar' }); return }
 
@@ -142,8 +147,8 @@ export const simularJornada = async (req: AuthRequest, res: Response) => {
     if (yaSimulada > 0) { res.status(409).json({ error: 'Esta jornada ya tiene estadísticas. Bórralas primero.' }); return }
 
     const config = await db.select().from(configPuntuacion).where(
-      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaCierre),
-          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaCierre)))
+      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada),
+          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada)))
     )
 
     const jeRaw = await db.select({
@@ -236,8 +241,8 @@ export const calcularPuntosPorJugador = async (req: AuthRequest, res: Response) 
     if (!j) { res.status(404).json({ error: 'Jornada no encontrada' }); return }
 
     const config = await db.select().from(configPuntuacion).where(
-      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaCierre),
-          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaCierre)))
+      and(eq(configPuntuacion.activo, true), lte(configPuntuacion.desde, j.fechaInicioJornada),
+          or(isNull(configPuntuacion.hasta), gte(configPuntuacion.hasta, j.fechaInicioJornada)))
     )
 
     const tramosReval = await cargarConfigRevalorizacion()

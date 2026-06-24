@@ -4,10 +4,15 @@ import json
 import subprocess
 import os
 import argparse
+from urllib.parse import urlparse
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 
 URL = "https://www.lapreferente.com/C22283-19/tercera-federacion-grupo-4/calendario.html"
+
+# Extraer nombre de competición del segundo segmento de la URL
+_partes_url = urlparse(URL).path.strip("/").split("/")
+COMPETICION = _partes_url[1]  # ej: "tercera-federacion-grupo-4"
 
 parser = argparse.ArgumentParser(description="Extrae estadísticas de una jornada")
 parser.add_argument("jornada", type=int, help="Número de jornada a extraer (ej: 1)")
@@ -242,23 +247,27 @@ def extraer_tarjetas(html_div, equipos):
                 nombre = td_jugador.get_text(strip=True)
                 nombre_completo = nombre
 
-            # Color de tarjeta desde el src de la imagen
-            img = td_tarjeta.find("img")
-            color = None
-            if img:
-                src = img.get("src", "").lower()
-                if "yellow" in src:
-                    color = "yellow"
-                elif "red" in src:
-                    color = "red"
+            # Contar amarillas y rojas desde todas las imágenes del td
+            imgs = td_tarjeta.find_all("img")
+            num_amarillas = sum(1 for i in imgs if "yellow" in i.get("src", "").lower())
+            num_rojas = sum(1 for i in imgs if "red" in i.get("src", "").lower())
 
-            print(f"  Tarjeta {color}: '{nombre}'", end="")
+            # Regla: si hay 3 imágenes (2 amarillas + 1 roja), la roja es consecuencia
+            # de la doble amarilla — no se cuenta como roja directa.
+            # Si hay 2 (1 amarilla + 1 roja), ambas cuentan.
+            tarjetas_evento = []
+            if num_amarillas == 2 and num_rojas == 1:
+                tarjetas_evento = ["yellow", "yellow"]
+            else:
+                tarjetas_evento = ["yellow"] * num_amarillas + ["red"] * num_rojas
+
+            print(f"  Tarjetas {tarjetas_evento}: '{nombre}'", end="")
 
             # Solo añadir si el jugador está en la plantilla (no cuerpo técnico)
             jugador = indice_equipo.get(nombre_completo)
             if jugador:
-                jugador.setdefault("tarjetas", []).append(color)
-                print(f" -> añadida")
+                jugador.setdefault("tarjetas", []).extend(tarjetas_evento)
+                print(f" -> añadidas")
             else:
                 print(f" -> no es jugador, ignorado")
 
@@ -268,12 +277,24 @@ def calcular_goles_jugadores(equipos, goles_equipos):
     Para cada jugador añade goles_a_favor y goles_en_contra:
     solo cuentan los goles marcados mientras estaba en el campo.
     Los suplentes que no jugaron reciben None.
+    El resultado (VICTORIA/EMPATE/DERROTA) es siempre el marcador global del partido.
     """
     for i, equipo_data in enumerate(equipos):
         goles_favor = goles_equipos[i]["goles"] if i < len(goles_equipos) else []
         goles_contra = goles_equipos[1 - i]["goles"] if (1 - i) < len(goles_equipos) else []
 
+        total_favor = len(goles_favor)
+        total_contra = len(goles_contra)
+        if total_favor > total_contra:
+            resultado_global = "VICTORIA"
+        elif total_favor < total_contra:
+            resultado_global = "DERROTA"
+        else:
+            resultado_global = "EMPATE"
+
         for jugador in equipo_data["jugadores"]:
+            jugador["resultado"] = resultado_global
+
             # Suplente que no pisó el campo
             if jugador["minuto_entrada"] is None:
                 jugador["goles_a_favor"] = None
@@ -408,10 +429,12 @@ async def main():
             "partidos": partidos,
         }
         json_filename = f"jornada_{NUM_JORNADA}.json"
-        json_path = os.path.join(os.path.dirname(__file__), json_filename)
+        json_dir = os.path.join(os.path.dirname(__file__), "Estadisticas", COMPETICION)
+        os.makedirs(json_dir, exist_ok=True)
+        json_path = os.path.join(json_dir, json_filename)
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(salida, f, ensure_ascii=False, indent=2)
-        print(f"\n[FIN] {len(partidos)} partidos guardados en {json_filename}")
+        print(f"\n[FIN] {len(partidos)} partidos guardados en Estadisticas/{COMPETICION}/{json_filename}")
 
         await browser.close()
 

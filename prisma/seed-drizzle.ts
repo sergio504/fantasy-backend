@@ -482,9 +482,9 @@ async function main() {
 
   for (const { division, ligaIds, nombre } of DIVISIONES_LIGAS) {
     for (let n = 1; n <= NUM_JORNADAS; n++) {
-      const fechaCierre = daysAgo((NUM_JORNADAS - n + 1) * 7)
+      const fechaInicioJornada = daysAgo((NUM_JORNADAS - n + 1) * 7)
       const jornadaId = uuid()
-      await db.insert(schema.jornada).values({ id: jornadaId, division, numJornada: n, fechaCierre })
+      await db.insert(schema.jornada).values({ id: jornadaId, division, numJornada: n, fechaInicioJornada })
 
       const snaps = await generarSnapshot(db as any, jornadaId, ligaIds)
       const stats = await simularJornada(db as any, jornadaId, division, configPts)

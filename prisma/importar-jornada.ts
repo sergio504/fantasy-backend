@@ -12,12 +12,14 @@ dotenv.config()
 
 // ── Configuración ─────────────────────────────────────────────
 const DIVISION: Division = 'RFEF3_GRUPO_IV'
+const COMPETICION_FOLDER = 'tercera-federacion-grupo-4'
+
 const numArg = process.argv[2]
 if (!numArg || isNaN(Number(numArg))) {
   console.error('Uso: npx tsx prisma/importar-jornada.ts <numero_jornada>')
   process.exit(1)
 }
-const JSON_PATH = path.resolve(__dirname, `../jornada_${numArg}.json`)
+const JSON_PATH = path.resolve(__dirname, `../Estadisticas/${COMPETICION_FOLDER}/jornada_${numArg}.json`)
 // ──────────────────────────────────────────────────────────────
 
 function uuid() { return crypto.randomUUID() }
@@ -159,7 +161,7 @@ async function main() {
       id,
       division: DIVISION,
       numJornada,
-      fechaCierre: new Date(),
+      fechaInicioJornada: null,
     })
     ;[jornadaRow] = await db.select().from(schema.jornada).where(eq(schema.jornada.id, id)).limit(1)
     console.log(`  Jornada creada: id=${jornadaRow.id}`)

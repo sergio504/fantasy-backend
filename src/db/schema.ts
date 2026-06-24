@@ -6,6 +6,17 @@ import { relations } from 'drizzle-orm'
 // ─── ENUMS ─────────────────────────────────────────
 
 export const divisionValues    = ['RFEF2_GRUPO_II', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA'] as const
+
+export const divisiones = mysqlTable('divisiones', {
+  id:              varchar('id', { length: 36 }).primaryKey(),
+  division:        mysqlEnum('division', divisionValues).notNull().unique(),
+  nombre:          varchar('nombre', { length: 255 }).notNull(),
+  temporada:       varchar('temporada', { length: 10 }).notNull(),
+  urlCalendario:   varchar('urlCalendario', { length: 500 }).notNull(),
+  carpetaArchivos: varchar('carpetaArchivos', { length: 100 }).notNull(),
+  activa:          boolean('activa').notNull().default(true),
+  creadoEn:        datetime('creadoEn').notNull(),
+})
 export const posicionValues    = ['PORTERO', 'DEFENSA', 'CENTROCAMPISTA', 'DELANTERO', 'UNKNOWN'] as const
 export const estadoOfertaValues = ['ACTIVA', 'VENDIDA', 'CANCELADA'] as const
 export const tipoAccionAdminValues = [
@@ -168,7 +179,8 @@ export const jornada = mysqlTable('jornada', {
   id:                        varchar('id', { length: 36 }).primaryKey(),
   division:                  mysqlEnum('division', divisionValues).notNull(),
   numJornada:                int('numJornada').notNull(),
-  fechaCierre:               datetime('fechaCierre').notNull(),
+  fechaInicioJornada:        datetime('fechaInicioJornada'),
+  fechaFinJornada:           datetime('fechaFinJornada'),
   fechaImportacion:          datetime('fechaImportacion'),
   snapshotGenerado:          boolean('snapshotGenerado').notNull().default(false),
   statsImportadas:           boolean('statsImportadas').notNull().default(false),

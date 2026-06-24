@@ -478,7 +478,7 @@ export const getHistorialAlineaciones = async (req: AuthRequest, res: Response) 
         .sort((a, b) => POS_ORDER.indexOf(a.jugador.posicion) - POS_ORDER.indexOf(b.jugador.posicion))
 
       return {
-        jornada:     { id: j.id, numJornada: j.numJornada, fechaCierre: j.fechaCierre },
+        jornada:     { id: j.id, numJornada: j.numJornada, fechaInicioJornada: j.fechaInicioJornada, fechaFinJornada: j.fechaFinJornada },
         totalPuntos: puntuacion?.puntos ?? null,
         jugadores:   jugadoresSnap,
       }
@@ -554,7 +554,7 @@ export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
         .sort((a, b) => POS_ORDER.indexOf(a.jugador.posicion) - POS_ORDER.indexOf(b.jugador.posicion))
 
       return {
-        jornada:     { id: j.id, numJornada: j.numJornada, fechaCierre: j.fechaCierre },
+        jornada:     { id: j.id, numJornada: j.numJornada, fechaInicioJornada: j.fechaInicioJornada, fechaFinJornada: j.fechaFinJornada },
         totalPuntos: puntuacion?.puntos ?? null,
         jugadores:   jugadoresSnap,
       }
