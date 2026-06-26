@@ -1,8 +1,8 @@
 [phases.install]
-cmds = ["npm ci", "npx playwright install chromium --with-deps"]
+cmds = ["npm ci", "PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium --with-deps"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "node dist/index.js"
+cmd = "PLAYWRIGHT_BROWSERS_PATH=0 node dist/index.js"
