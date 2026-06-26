@@ -191,8 +191,9 @@ export async function extraerJornada(urlCalendario: string, numJornada: number):
     })
     const page = await context.newPage()
     await page.addInitScript(() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) })
-    await page.goto(urlCalendario, { waitUntil: 'networkidle', timeout: 60_000 })
-    await page.waitForSelector('#calendarContainer', { timeout: 20_000 }).catch(() => {})
+    await page.goto(urlCalendario, { waitUntil: 'domcontentloaded', timeout: 60_000 })
+    await page.waitForFunction(() => !document.title.includes('Just a moment'), { timeout: 30_000 }).catch(() => {})
+    await page.waitForSelector('#calendarContainer', { timeout: 15_000 }).catch(() => {})
     console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
 
     const pageTitle = await page.title()
