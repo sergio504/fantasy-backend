@@ -1,4 +1,3 @@
-process.env.PLAYWRIGHT_BROWSERS_PATH = '0'
 import { chromium } from 'playwright'
 
 // ── Tipos ───────────────────────────────────────────────────────
