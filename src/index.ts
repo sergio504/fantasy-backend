@@ -86,6 +86,7 @@ app.listen(PORT, () => {
   // Scheduler de jornadas: snapshot automático y cálculo de puntuaciones
   const MS_5MIN = 5 * 60 * 1000
   const ejecutarSchedulerJornadas = async () => {
+    console.log(`[JOB] Scheduler jornadas tick — ${new Date().toISOString()}`)
     try {
       await ejecutarJobsJornada()
     } catch (e) {
