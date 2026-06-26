@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 import { Request, Response } from 'express'
 import { eq, and, notInArray, inArray, count, desc, asc, lte, gte, sum, exists, sql } from 'drizzle-orm'
 import { db } from '../db'
+import { cargarAliasEquipos } from '../lib/aliasUtils'
 import {
   liga, miembroLiga, jugador, jugadorEquipo, equipo, usuario,
   plantillaFantasy, titularLiga, snapshotAlineacion, jornada,
@@ -279,10 +280,11 @@ export const getMiEquipo = async (req: AuthRequest, res: Response) => {
           .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
           .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, jugadorIds)))
       : []
+    const aliasMapMiEquipo = await cargarAliasEquipos([...new Set(equiposActivos.map(r => r.eId))])
     const histMap = new Map(equiposActivos.map(r => [r.jeJugadorId, {
       id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
       desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
-      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+      equipo: { id: r.eId, nombre: aliasMapMiEquipo.get(r.eId) ?? r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
     }]))
 
     const [titularesSet, pendientesClausulazo] = await Promise.all([
@@ -354,10 +356,11 @@ export const getJugadoresDisponibles = async (req: AuthRequest, res: Response) =
       .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
       .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, ids)))
 
+    const aliasMapDisp = await cargarAliasEquipos([...new Set(equiposActivos.map(r => r.eId))])
     const histMap = new Map(equiposActivos.map(r => [r.jeJugadorId, {
       id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
       desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
-      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+      equipo: { id: r.eId, nombre: aliasMapDisp.get(r.eId) ?? r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
     }]))
     res.json(jugadores.map(j => ({ ...j, historialEquipos: histMap.has(j.id) ? [histMap.get(j.id)!] : [] })))
   } catch {
@@ -519,7 +522,7 @@ export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
             jeId: jugadorEquipo.id,
             jugId: jugador.id,
             jugNombreCompleto: jugador.nombreCompleto, jugNombre: jugador.nombre, jugPosicion: jugador.posicion,
-            equipoNombre: equipo.nombre,
+            equipoId: equipo.id, equipoNombre: equipo.nombre,
             snapEsCapitan: snapshotAlineacion.esCapitan,
           })
           .from(snapshotAlineacion)
@@ -533,10 +536,13 @@ export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
       ])
 
       const jeIds = snapsRaw.map(r => r.jeId)
-      const statsRows = jeIds.length > 0
-        ? await db.select().from(estadisticaJornada)
-            .where(and(eq(estadisticaJornada.jornadaId, j.id), inArray(estadisticaJornada.jugadorEquipoId, jeIds)))
-        : []
+      const [statsRows, aliasMapHistorial] = await Promise.all([
+        jeIds.length > 0
+          ? db.select().from(estadisticaJornada)
+              .where(and(eq(estadisticaJornada.jornadaId, j.id), inArray(estadisticaJornada.jugadorEquipoId, jeIds)))
+          : Promise.resolve([]),
+        cargarAliasEquipos([...new Set(snapsRaw.map(r => r.equipoId))]),
+      ])
       const statsMap = new Map(statsRows.map(s => [s.jugadorEquipoId, s]))
 
       const jugadoresSnap = snapsRaw
@@ -546,7 +552,7 @@ export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
           return {
             jugadorId:    r.jugId,
             jugador:      { nombre: r.jugNombre, nombreCompleto: r.jugNombreCompleto, posicion: r.jugPosicion },
-            equipo:       r.equipoNombre,
+            equipo:       aliasMapHistorial.get(r.equipoId) ?? r.equipoNombre,
             esCapitan:    r.snapEsCapitan,
             puntos,
           }

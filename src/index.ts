@@ -8,7 +8,9 @@ import mercadoRoutes from './routes/market.routes'
 import adminRoutes from './routes/admin.routes'
 import jornadaRoutes from './routes/jornada.routes'
 import clausulazoRoutes from './routes/clausulazo.routes'
+import explorarRoutes from './routes/explorar.routes'
 import { ponerJugadoresEnMercado, resolverOfertasCaducadas } from './jobs/mercadoAutomatico'
+import { ejecutarJobsJornada } from './jobs/jornadaScheduler'
 
 dotenv.config()
 
@@ -26,6 +28,7 @@ app.use('/api/ligas/:ligaId/plantillas', clausulazoRoutes)
 app.use('/api/jugadores', jugadorRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/jornadas', jornadaRoutes)
+app.use('/api/explorar', explorarRoutes)
 
 // Health check
 app.get('/health', (req, res) => {
@@ -79,4 +82,17 @@ app.listen(PORT, () => {
 
   ejecutarResolucion() // ejecutar también al arrancar
   setInterval(ejecutarResolucion, 60 * 60 * 1000) // cada hora
+
+  // Scheduler de jornadas: snapshot automático y cálculo de puntuaciones
+  const MS_5MIN = 5 * 60 * 1000
+  const ejecutarSchedulerJornadas = async () => {
+    try {
+      await ejecutarJobsJornada()
+    } catch (e) {
+      console.error('[JOB] Error inesperado en scheduler de jornadas:', e)
+    }
+  }
+  ejecutarSchedulerJornadas() // ejecutar también al arrancar
+  setInterval(ejecutarSchedulerJornadas, MS_5MIN)
+  console.log('[JOB] Scheduler de jornadas activo (cada 5 min)')
 })

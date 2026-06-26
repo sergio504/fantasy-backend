@@ -6,6 +6,7 @@ import { ofertaMercado, puja, miembroLiga, plantillaFantasy, titularLiga, jugado
 import { AuthRequest } from '../middleware/auth.middleware'
 import { cerrarOfertaLogic } from '../lib/cerrarOfertaLogic'
 import { registrarMovimientoSaldo } from '../lib/historial'
+import { cargarAliasEquipos } from '../lib/aliasUtils'
 
 async function getMiembro(ligaId: string, usuarioId: string) {
   return db.query.miembroLiga.findFirst({
@@ -62,10 +63,11 @@ export const getOfertasLiga = async (req: AuthRequest, res: Response) => {
         : Promise.resolve([]),
     ])
 
+    const aliasMapOfertas = await cargarAliasEquipos([...new Set(equiposActivos.map(r => r.eId))])
     const histMap  = new Map(equiposActivos.map(r => [r.jeJugadorId, {
       id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
       desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
-      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+      equipo: { id: r.eId, nombre: aliasMapOfertas.get(r.eId) ?? r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
     }]))
     const pujaMap  = new Map(misPujas.map(p => [p.ofertaMercadoId, p.cantidad]))
     const countMap = new Map(pujaCounts.map(c => [c.ofertaId, c.total]))
@@ -333,10 +335,11 @@ export const getTransferencias = async (req: AuthRequest, res: Response) => {
           .innerJoin(equipo, eq(equipo.id, jugadorEquipo.equipoId))
           .where(and(eq(jugadorEquipo.activo, true), inArray(jugadorEquipo.jugadorId, jugadorIds)))
       : []
+    const aliasMapTrans = await cargarAliasEquipos([...new Set(equiposActivos.map(r => r.eId))])
     const histMap = new Map(equiposActivos.map(r => [r.jeJugadorId, {
       id: r.jeId, jugadorId: r.jeJugadorId, equipoId: r.jeEquipoId,
       desde: r.jeDesde, hasta: r.jeHasta, activo: r.jeActivo, creadoEn: r.jeCreadoEn,
-      equipo: { id: r.eId, nombre: r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
+      equipo: { id: r.eId, nombre: aliasMapTrans.get(r.eId) ?? r.eNombre, division: r.eDivision, creadoEn: r.eCreadoEn },
     }]))
 
     res.json(transferenciasRaw.map(t => {

@@ -8,6 +8,7 @@ import {
 } from '../db/schema'
 import { AuthRequest } from '../middleware/auth.middleware'
 import { registrarMovimientoSaldo, registrarCambioClausula } from '../lib/historial'
+import { cargarAliasEquipos } from '../lib/aliasUtils'
 
 async function getMiembro(ligaId: string, usuarioId: string) {
   return db.query.miembroLiga.findFirst({
@@ -55,6 +56,7 @@ export const getPlantillasLiga = async (req: AuthRequest, res: Response) => {
       jugadorIds.length > 0
         ? db.select({
               jeJugadorId: jugadorEquipo.jugadorId,
+              eId: equipo.id,
               eNombre: equipo.nombre,
             })
             .from(jugadorEquipo)
@@ -63,9 +65,10 @@ export const getPlantillasLiga = async (req: AuthRequest, res: Response) => {
         : Promise.resolve([]),
     ])
 
+    const aliasMapClausula = await cargarAliasEquipos([...new Set(equiposActivos.map(e => e.eId))])
     const pendienteMap   = new Map(pendientes.map(cp => [cp.jugadorId, cp]))
     const propietarioMap = new Map(propietarios.map(p => [p.mlId, p.uUsername]))
-    const equipoMap      = new Map(equiposActivos.map(e => [e.jeJugadorId, e.eNombre]))
+    const equipoMap      = new Map(equiposActivos.map(e => [e.jeJugadorId, aliasMapClausula.get(e.eId) ?? e.eNombre]))
 
     res.json(plantillaRaw.map(p => ({
       plantillaId:     p.pfId,
