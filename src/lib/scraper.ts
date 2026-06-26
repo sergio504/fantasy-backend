@@ -1,4 +1,6 @@
-import { chromium } from 'playwright'
+import { chromium } from 'playwright-extra'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+chromium.use(StealthPlugin())
 
 // ── Tipos ───────────────────────────────────────────────────────
 
@@ -184,7 +186,8 @@ export async function extraerJornada(urlCalendario: string, numJornada: number):
   const browser = await chromium.launch({ headless: true })
   try {
     const page = await browser.newPage()
-    await page.goto(urlCalendario, { waitUntil: 'domcontentloaded', timeout: 60_000 })
+    await page.goto(urlCalendario, { waitUntil: 'networkidle', timeout: 60_000 })
+    await page.waitForSelector('#calendarContainer', { timeout: 20_000 }).catch(() => {})
     console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
 
     const pageTitle = await page.title()
