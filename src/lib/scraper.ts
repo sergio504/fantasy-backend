@@ -1,6 +1,4 @@
-import { chromium } from 'playwright-extra'
-import StealthPlugin from 'puppeteer-extra-plugin-stealth'
-chromium.use(StealthPlugin())
+import { chromium } from 'playwright'
 
 // ── Tipos ───────────────────────────────────────────────────────
 
@@ -183,9 +181,16 @@ async function procesarPartido(page: any, url: string, idx: number): Promise<Par
 // ── Export principal ────────────────────────────────────────────
 
 export async function extraerJornada(urlCalendario: string, numJornada: number): Promise<JornadaScraped | null> {
-  const browser = await chromium.launch({ headless: true })
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
+  })
   try {
-    const page = await browser.newPage()
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    })
+    const page = await context.newPage()
+    await page.addInitScript(() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) })
     await page.goto(urlCalendario, { waitUntil: 'networkidle', timeout: 60_000 })
     await page.waitForSelector('#calendarContainer', { timeout: 20_000 }).catch(() => {})
     console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
