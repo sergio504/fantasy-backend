@@ -187,6 +187,11 @@ export async function extraerJornada(urlCalendario: string, numJornada: number):
     await page.goto(urlCalendario, { waitUntil: 'domcontentloaded', timeout: 60_000 })
     console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
 
+    const pageTitle = await page.title()
+    console.log(`[SCRAPER] Título página: "${pageTitle}"`)
+    const calendarExists = await page.evaluate(() => !!document.querySelector('#calendarContainer'))
+    console.log(`[SCRAPER] #calendarContainer existe: ${calendarExists}`)
+
     const { urlsJornada, nombreJornada } = await page.evaluate((numJornada: number) => {
       const urlsJornada: string[] = []
       let nombreJornada: string | null = null
