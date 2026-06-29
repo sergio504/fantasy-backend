@@ -1,8 +1,8 @@
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm install"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "PLAYWRIGHT_BROWSERS_PATH=0 node dist/index.js"
+cmd = "node dist/index.js"
