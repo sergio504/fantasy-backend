@@ -84,7 +84,7 @@ app.listen(PORT, () => {
   setInterval(ejecutarResolucion, 60 * 60 * 1000) // cada hora
 
   // Scheduler de jornadas: snapshot automático y cálculo de puntuaciones
-  const MS_5MIN = 5 * 60 * 1000
+  const MS_6H = 6 * 60 * 60 * 1000
   const ejecutarSchedulerJornadas = async () => {
     console.log(`[JOB] Scheduler jornadas tick — ${new Date().toISOString()}`)
     try {
@@ -93,7 +93,7 @@ app.listen(PORT, () => {
       console.error('[JOB] Error inesperado en scheduler de jornadas:', e)
     }
   }
-  ejecutarSchedulerJornadas() // ejecutar también al arrancar
-  setInterval(ejecutarSchedulerJornadas, MS_5MIN)
-  console.log('[JOB] Scheduler de jornadas activo (cada 5 min)')
+  ejecutarSchedulerJornadas()
+  setInterval(ejecutarSchedulerJornadas, MS_6H)
+  console.log('[JOB] Scheduler de jornadas activo (cada 6h)')
 })
