@@ -8,7 +8,6 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "postinstall": "npx playwright install chromium --with-deps",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
@@ -29,8 +28,8 @@
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.5",
-    "playwright": "^1.60.0"
+    "cheerio": "^1.0.0",
+    "mysql2": "^3.22.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
