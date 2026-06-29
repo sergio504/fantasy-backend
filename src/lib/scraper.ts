@@ -1,4 +1,38 @@
 import { chromium } from 'playwright'
+import https from 'https'
+import http from 'http'
+
+async function flareSolve(url: string): Promise<string> {
+  const flareUrl = process.env.FLARESOLVERR_URL
+  if (!flareUrl) throw new Error('FLARESOLVERR_URL no configurada')
+
+  const body = JSON.stringify({ cmd: 'request.get', url, maxTimeout: 60000 })
+  const parsed = new URL(flareUrl + '/v1')
+  const lib = parsed.protocol === 'https:' ? https : http
+
+  return new Promise((resolve, reject) => {
+    const req = lib.request({
+      hostname: parsed.hostname,
+      port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+      path: parsed.pathname,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+    }, res => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data)
+          if (json.status !== 'ok') reject(new Error(`FlareSolverr error: ${json.message}`))
+          else resolve(json.solution.response as string)
+        } catch (e) { reject(e) }
+      })
+    })
+    req.on('error', reject)
+    req.write(body)
+    req.end()
+  })
+}
 
 // ── Tipos ───────────────────────────────────────────────────────
 
@@ -43,7 +77,8 @@ export interface JornadaScraped {
 
 async function procesarPartido(page: any, url: string, idx: number): Promise<PartidoScraped | null> {
   console.log(`[SCRAPER] Partido ${idx}: ${url}`)
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 })
+  const html = await flareSolve(url)
+  await page.setContent(html, { waitUntil: 'domcontentloaded' })
 
   const sinAlineaciones = await page.evaluate(() => !document.querySelector('#divAlineacionesPartido'))
   if (sinAlineaciones) return null
@@ -181,25 +216,14 @@ async function procesarPartido(page: any, url: string, idx: number): Promise<Par
 // ── Export principal ────────────────────────────────────────────
 
 export async function extraerJornada(urlCalendario: string, numJornada: number): Promise<JornadaScraped | null> {
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
-  })
+  const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   try {
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    })
-    const page = await context.newPage()
-    await page.addInitScript(() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) })
-    await page.goto(urlCalendario, { waitUntil: 'domcontentloaded', timeout: 60_000 })
-    await page.waitForFunction(() => !document.title.includes('Just a moment'), { timeout: 30_000 }).catch(() => {})
-    await page.waitForSelector('#calendarContainer', { timeout: 15_000 }).catch(() => {})
-    console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
+    const page = await browser.newPage()
 
-    const pageTitle = await page.title()
-    console.log(`[SCRAPER] Título página: "${pageTitle}"`)
-    const calendarExists = await page.evaluate(() => !!document.querySelector('#calendarContainer'))
-    console.log(`[SCRAPER] #calendarContainer existe: ${calendarExists}`)
+    console.log(`[SCRAPER] Resolviendo calendario via FlareSolverr...`)
+    const htmlCalendario = await flareSolve(urlCalendario)
+    await page.setContent(htmlCalendario, { waitUntil: 'domcontentloaded' })
+    console.log(`[SCRAPER] Calendario cargado. Buscando jornada ${numJornada}...`)
 
     const { urlsJornada, nombreJornada } = await page.evaluate((numJornada: number) => {
       const urlsJornada: string[] = []

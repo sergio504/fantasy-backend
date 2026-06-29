@@ -1,14 +1,6 @@
-import { execSync } from 'child_process'
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-
-try {
-  execSync('npx playwright install chromium --with-deps', { stdio: 'inherit' })
-  console.log('[INIT] Playwright Chromium listo')
-} catch (e) {
-  console.error('[INIT] Error instalando Playwright:', e)
-}
 import authRoutes from './routes/auth.routes'
 import ligaRoutes from './routes/league.routes'
 import jugadorRoutes from './routes/player.routes'
