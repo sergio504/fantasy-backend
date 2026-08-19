@@ -4,7 +4,7 @@ import { adminMiddleware } from '../middleware/admin.middleware'
 import {
   crearJornada, editarJornada, getJornadas,
   generarSnapshot, simularJornada, calcularPuntuaciones, calcularPuntosPorJugador,
-  getPuntuacionesJornada, getEstadisticasJornada,
+  getPuntuacionesJornada, getEstadisticasJornada, importarEstadisticasDesdeArchivo,
 } from '../controllers/jornada.controller'
 
 const router = Router()
@@ -17,6 +17,7 @@ router.post('/:jornadaId/snapshot',            authMiddleware, adminMiddleware, 
 router.post('/:jornadaId/simular',             authMiddleware, adminMiddleware, simularJornada)
 router.post('/:jornadaId/calcular-puntos',     authMiddleware, adminMiddleware, calcularPuntosPorJugador)
 router.post('/:jornadaId/calcular',            authMiddleware, adminMiddleware, calcularPuntuaciones)
+router.post('/:jornadaId/importar',            authMiddleware, adminMiddleware, importarEstadisticasDesdeArchivo)
 
 // Rutas de usuario (dentro de una liga)
 router.get('/liga/:ligaId/:jornadaId',         authMiddleware, getPuntuacionesJornada)

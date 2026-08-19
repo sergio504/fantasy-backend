@@ -12,6 +12,7 @@ import { registrarAccion } from '../lib/registrarAccion'
 import {
   calcularPuntos, generarSnapshotOp, calcularPuntosPorJugadorOp, calcularPuntuacionesOp,
 } from '../lib/jornadaOps'
+import { importarEstadisticas } from '../lib/importarEstadisticas'
 
 // ─── HELPERS (solo usados por simularJornada) ──────
 
@@ -179,6 +180,30 @@ export const calcularPuntuaciones = async (req: AuthRequest, res: Response) => {
   } catch (e: any) {
     const status = e.message?.includes('no encontrada') ? 404 : e.message?.includes('No hay snapshots') ? 409 : 500
     res.status(status).json({ error: e.message ?? 'Error al calcular puntuaciones' })
+  }
+}
+
+// ─── IMPORTAR STATS DESDE FICHERO ─────────────────
+
+export const importarEstadisticasDesdeArchivo = async (req: AuthRequest, res: Response) => {
+  const jornadaId = req.params.jornadaId as string
+
+  try {
+    const [j] = await db.select().from(jornada).where(eq(jornada.id, jornadaId)).limit(1)
+    if (!j) { res.status(404).json({ error: 'Jornada no encontrada' }); return }
+    if (j.statsImportadas) { res.status(409).json({ error: 'Esta jornada ya tiene estadísticas importadas' }); return }
+
+    const data = req.body
+    if (!data || !Array.isArray(data.partidos)) {
+      res.status(400).json({ error: 'Formato inválido. El JSON debe tener un campo "partidos" con array de partidos.' }); return
+    }
+
+    const { ok, noEncontrado } = await importarEstadisticas(data, j.division, jornadaId)
+    await registrarAccion(req.usuarioId!, 'SIMULAR_JORNADA', 'Jornada', jornadaId, { importado: true, ok, noEncontrado })
+
+    res.json({ mensaje: `Importación completada: ${ok} jugadores registrados, ${noEncontrado} no encontrados`, ok, noEncontrado })
+  } catch (e: any) {
+    res.status(500).json({ error: e.message ?? 'Error al importar estadísticas' })
   }
 }
 
