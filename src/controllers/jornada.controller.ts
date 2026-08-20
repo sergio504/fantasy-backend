@@ -201,7 +201,27 @@ export const importarEstadisticasDesdeArchivo = async (req: AuthRequest, res: Re
     const { ok, noEncontrado } = await importarEstadisticas(data, j.division, jornadaId)
     await registrarAccion(req.usuarioId!, 'SIMULAR_JORNADA', 'Jornada', jornadaId, { importado: true, ok, noEncontrado })
 
-    res.json({ mensaje: `Importación completada: ${ok} jugadores registrados, ${noEncontrado} no encontrados`, ok, noEncontrado })
+    // Encadenar el resto del proceso al momento, sin esperar al scheduler.
+    // Se llama primero a generarSnapshotOp por si la jornada aún no tenía
+    // snapshot (p.ej. no se puso fechaInicioJornada y el scheduler nunca
+    // lo disparó); si ya lo tenía, es un no-op inmediato, no reprocesa nada.
+    // Si falla algún paso posterior no se pierde la importación ya hecha:
+    // el scheduler lo recogerá más tarde igualmente.
+    let puntosMensaje: string | null = null
+    let puntuacionesMensaje: string | null = null
+    let procesoError: string | null = null
+    try {
+      await generarSnapshotOp(jornadaId, req.usuarioId!)
+      puntosMensaje = await calcularPuntosPorJugadorOp(jornadaId, req.usuarioId!)
+      puntuacionesMensaje = await calcularPuntuacionesOp(jornadaId, req.usuarioId!)
+    } catch (e: any) {
+      procesoError = e.message ?? 'Error al continuar el proceso tras importar'
+    }
+
+    res.json({
+      mensaje: `Importación completada: ${ok} jugadores registrados, ${noEncontrado} no encontrados`,
+      ok, noEncontrado, puntosMensaje, puntuacionesMensaje, procesoError,
+    })
   } catch (e: any) {
     res.status(500).json({ error: e.message ?? 'Error al importar estadísticas' })
   }
