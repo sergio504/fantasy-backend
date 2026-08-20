@@ -1,9 +1,7 @@
 import { and, eq, isNotNull, lte } from 'drizzle-orm'
 import { db } from '../db'
-import { jornada, divisiones } from '../db/schema'
+import { jornada } from '../db/schema'
 import { generarSnapshotOp, calcularPuntosPorJugadorOp, calcularPuntuacionesOp } from '../lib/jornadaOps'
-import { extraerJornada } from '../lib/scraper'
-import { importarEstadisticas } from '../lib/importarEstadisticas'
 
 export async function ejecutarJobsJornada() {
   const ahora = new Date()
@@ -28,42 +26,9 @@ export async function ejecutarJobsJornada() {
     }
   }
 
-  // ── Job 2: Scraper + importación ────────────────────────────
-  // Cuando fechaFinJornada ha pasado, snapshot hecho y stats no importadas
-  const parScraper = await db
-    .select({ id: jornada.id, division: jornada.division, numJornada: jornada.numJornada })
-    .from(jornada)
-    .where(and(
-      isNotNull(jornada.fechaFinJornada),
-      lte(jornada.fechaFinJornada, ahora),
-      eq(jornada.snapshotGenerado, true),
-      eq(jornada.statsImportadas, false),
-    ))
-
-  for (const j of parScraper) {
-    try {
-      const [divInfo] = await db.select().from(divisiones)
-        .where(eq(divisiones.division, j.division)).limit(1)
-
-      if (!divInfo) {
-        console.error(`[JOB] Sin entrada en divisiones para ${j.division}`)
-        continue
-      }
-
-      console.log(`[JOB] Scraper J${j.numJornada} (${j.division}): iniciando...`)
-      const data = await extraerJornada(divInfo.urlCalendario, j.numJornada)
-
-      if (!data) {
-        console.warn(`[JOB] Scraper J${j.numJornada}: sin datos`)
-        continue
-      }
-
-      const { ok, noEncontrado } = await importarEstadisticas(data, j.division, j.id)
-      console.log(`[JOB] Import J${j.numJornada}: ${ok} OK, ${noEncontrado} no encontrados`)
-    } catch (e: any) {
-      console.error(`[JOB] Error scraper J${j.numJornada} (${j.division}): ${e.message}`)
-    }
-  }
+  // Job 2 (scraper + importación automática) eliminado: las estadísticas
+  // se suben a mano vía POST /api/jornadas/:jornadaId/importar, que ya
+  // marca `statsImportadas = true` y deja que el Job 3 siga solo desde ahí.
 
   // ── Job 3: Puntos por jugador ────────────────────────────────
   // Cuando fechaFinJornada ha pasado, stats importadas y puntos sin calcular
