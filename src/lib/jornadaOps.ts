@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { eq, and, or, asc, lte, gte, isNull, count, inArray, sql } from 'drizzle-orm'
+import { eq, and, or, asc, lte, gte, isNull, inArray, sql } from 'drizzle-orm'
 import { db } from '../db'
 import {
   jornada, estadisticaJornada, snapshotAlineacion, puntuacionJornada, penalizacionJornada,
@@ -121,11 +121,13 @@ export async function generarSnapshotOp(jornadaId: string, adminId?: string): Pr
   const [j] = await db.select().from(jornada).where(eq(jornada.id, jornadaId)).limit(1)
   if (!j) throw new Error('Jornada no encontrada')
 
-  const [{ total: yaExiste }] = await db.select({ total: count() }).from(snapshotAlineacion).where(eq(snapshotAlineacion.jornadaId, jornadaId))
-  if (yaExiste > 0) {
-    await db.update(jornada).set({ snapshotGenerado: true }).where(eq(jornada.id, jornadaId))
-    return 'Snapshot ya existía — marcado como completado'
-  }
+  // Foto fija de una sola vez por jornada: se guarda con la bandera
+  // `snapshotGenerado`, no contando filas (si todo el mundo está incompleto
+  // no se crea ninguna fila de snapshot, y contar filas haría que se
+  // reprocesara —y repenalizara— cada vez que se llamara de nuevo).
+  // Una vez hecha la foto, quien se una a la liga más tarde no entra:
+  // no tiene snapshot ni penalización esa jornada.
+  if (j.snapshotGenerado) return 'Snapshot ya generado para esta jornada'
 
   const ligas = await db.select({ id: liga.id }).from(liga).where(eq(liga.division, j.division))
   const ligaIds = ligas.map(l => l.id)
