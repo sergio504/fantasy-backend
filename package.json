@@ -16,7 +16,8 @@
     "seed:demo": "ts-node -P tsconfig.scripts.json prisma/seed-demo.ts",
     "import:jugadores": "ts-node -P tsconfig.scripts.json prisma/importar-jugadores.ts",
     "seed": "ts-node -P tsconfig.scripts.json prisma/seed-drizzle.ts",
-    "reset:jornadas": "ts-node -P tsconfig.scripts.json prisma/reset-jornadas.ts"
+    "reset:jornadas": "ts-node -P tsconfig.scripts.json prisma/reset-jornadas.ts",
+    "reparar:valores": "ts-node -P tsconfig.scripts.json prisma/reparar-corrupcion-valores.ts"
   },
   "keywords": [],
   "author": "",
