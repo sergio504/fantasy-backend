@@ -1,7 +1,6 @@
 import asyncio
 import re
 import json
-import subprocess
 import os
 import argparse
 from urllib.parse import urlparse
@@ -435,22 +434,9 @@ async def main():
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(salida, f, ensure_ascii=False, indent=2)
         print(f"\n[FIN] {len(partidos)} partidos guardados en Estadisticas/{COMPETICION}/{json_filename}")
+        print(f"[FIN] Sube ese fichero a mano desde el panel de admin (botón \"Importar stats\").")
 
         await browser.close()
-
-    # Llamar al importador TypeScript una vez cerrado el browser
-    print(f"\n[IMPORT] Lanzando importar-jornada.ts ...")
-    backend_dir = os.path.dirname(__file__)
-    resultado = subprocess.run(
-        f"npx tsx prisma/importar-jornada.ts {NUM_JORNADA}",
-        cwd=backend_dir,
-        text=True,
-        shell=True,
-    )
-    if resultado.returncode == 0:
-        print("[IMPORT] Importación completada correctamente.")
-    else:
-        print(f"[IMPORT] Error en la importación (código {resultado.returncode}).")
 
 
 asyncio.run(main())
