@@ -470,7 +470,9 @@ export const getHistorialAlineaciones = async (req: AuthRequest, res: Response) 
       const jugadoresSnap = snapsRaw
         .map(r => {
           const stats  = statsMap.get(r.jeId) ?? null
-          const puntos = stats ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
+          const puntos = stats
+            ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados)
+            : (j.puntosPorJugadorCalculados ? 0 : null)
           return {
             jugador:     { nombreCompleto: r.jugNombreCompleto, nombre: r.jugNombre, posicion: r.jugPosicion },
             esCapitan:   r.snapEsCapitan,
@@ -548,7 +550,9 @@ export const getHistorialMiembro = async (req: AuthRequest, res: Response) => {
       const jugadoresSnap = snapsRaw
         .map(r => {
           const stats  = statsMap.get(r.jeId) ?? null
-          const puntos = stats ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados) : null
+          const puntos = stats
+            ? (r.snapEsCapitan ? stats.puntosCalculados * 2 : stats.puntosCalculados)
+            : (j.puntosPorJugadorCalculados ? 0 : null)
           return {
             jugadorId:    r.jugId,
             jugador:      { nombre: r.jugNombre, nombreCompleto: r.jugNombreCompleto, posicion: r.jugPosicion },
