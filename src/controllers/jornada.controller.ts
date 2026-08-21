@@ -69,7 +69,7 @@ export const getJornadas = async (req: AuthRequest, res: Response) => {
   try {
     const jornadasRaw = await db.select().from(jornada)
       .where(division ? eq(jornada.division, division as Division) : undefined)
-      .orderBy(asc(jornada.division), asc(jornada.numJornada))
+      .orderBy(asc(jornada.division), desc(jornada.numJornada))
 
     if (jornadasRaw.length === 0) { res.json([]); return }
 
