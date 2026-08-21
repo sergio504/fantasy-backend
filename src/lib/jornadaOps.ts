@@ -88,8 +88,10 @@ function pctRevalorizacion(puntos: number, tramos: TramoReval[]): number {
   return tramos[tramos.length - 1]?.porcentaje ?? 0
 }
 
-const VALOR_MINIMO = 1_000_000
-const REDONDEO     =   100_000
+// Misma escala pequeña que usa el resto del juego: presupuestoInicial de
+// liga ~60-100 y valor inicial de jugador ~5-60 (ver importar-jugadores.ts).
+const VALOR_MINIMO = 1
+const REDONDEO     = 1
 
 function revalorizar(valorActual: number, puntos: number, tramos: TramoReval[]): number {
   const pct        = pctRevalorizacion(puntos, tramos)
@@ -99,13 +101,13 @@ function revalorizar(valorActual: number, puntos: number, tramos: TramoReval[]):
 }
 
 const DEFAULTS_ECONOMIA: Record<string, number> = {
-  INGRESO_FIJO:      500_000,
-  INGRESO_POR_PUNTO:  50_000,
-  BONUS_P1:        3_000_000,
-  BONUS_P2:        2_000_000,
-  BONUS_P3:        1_500_000,
-  BONUS_P4:        1_000_000,
-  BONUS_P5:          500_000,
+  INGRESO_FIJO:      3,
+  INGRESO_POR_PUNTO: 0.3,
+  BONUS_P1:         15,
+  BONUS_P2:         10,
+  BONUS_P3:          8,
+  BONUS_P4:          5,
+  BONUS_P5:          3,
 }
 
 export async function cargarConfigEconomia(): Promise<Record<string, number>> {
@@ -290,7 +292,7 @@ export async function calcularPuntuacionesOp(jornadaId: string, adminId?: string
     if (puntos > 0) await db.update(miembroLiga).set({ puntuacion: sql`${miembroLiga.puntuacion} + ${puntos}` }).where(eq(miembroLiga.id, miembroLigaId))
 
     const bonus   = bonusPosicion.get(miembroLigaId) ?? 0
-    const ingreso = eco.INGRESO_FIJO + (puntos * eco.INGRESO_POR_PUNTO) + bonus
+    const ingreso = Math.round(eco.INGRESO_FIJO + (puntos * eco.INGRESO_POR_PUNTO) + bonus)
     await db.update(miembroLiga).set({ presupuestoRestante: sql`${miembroLiga.presupuestoRestante} + ${ingreso}` }).where(eq(miembroLiga.id, miembroLigaId))
     calculados++
   }
