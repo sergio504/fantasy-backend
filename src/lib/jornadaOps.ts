@@ -224,10 +224,13 @@ export async function calcularPuntosPorJugadorOp(jornadaId: string, adminId?: st
 
     if (!jugadoresActualizados.has(jugadorId)) {
       const nuevoValor = revalorizar(valorActual, total, tramosReval)
+      // Se registra siempre, aunque el valor no cambie (redondeo), para que
+      // el histórico tenga un punto por cada jornada jugada y la gráfica no
+      // tenga huecos.
       if (nuevoValor !== valorActual) {
         await db.update(jugador).set({ valor: nuevoValor }).where(eq(jugador.id, jugadorId))
-        await registrarCambioValor({ jugadorId, valorAnterior: valorActual, valorNuevo: nuevoValor, numJornada: j.numJornada })
       }
+      await registrarCambioValor({ jugadorId, valorAnterior: valorActual, valorNuevo: nuevoValor, numJornada: j.numJornada })
       jugadoresActualizados.add(jugadorId)
     }
     actualizados++
