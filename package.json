@@ -17,7 +17,8 @@
     "import:jugadores": "ts-node -P tsconfig.scripts.json prisma/importar-jugadores.ts",
     "seed": "ts-node -P tsconfig.scripts.json prisma/seed-drizzle.ts",
     "reset:jornadas": "ts-node -P tsconfig.scripts.json prisma/reset-jornadas.ts",
-    "reparar:valores": "ts-node -P tsconfig.scripts.json prisma/reparar-corrupcion-valores.ts"
+    "reparar:valores": "ts-node -P tsconfig.scripts.json prisma/reparar-corrupcion-valores.ts",
+    "backfill:saldo": "ts-node -P tsconfig.scripts.json prisma/backfill-historial-saldo.ts"
   },
   "keywords": [],
   "author": "",
