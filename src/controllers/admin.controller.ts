@@ -4,7 +4,7 @@ import { AuthRequest } from '../middleware/auth.middleware'
 import { eq, and, or, asc, desc, gte, isNull, lte, inArray, count, sql } from 'drizzle-orm'
 import { db } from '../db'
 import {
-  usuario, liga, jugador, jugadorEquipo, equipo, estadisticaJornada,
+  usuario, liga, jugador, jugadorEquipo, equipo, estadisticaJornada, estadisticaJornadaSinRegistrar,
   configPuntuacion, configEconomia, configRevalorizacion, historialAdmin, historialConfig, ofertaMercado, puja, miembroLiga,
   snapshotAlineacion, puntuacionJornada, jornada, aliasEquipo, aliasJugador,
   Posicion, AccionPuntuacion, ResultadoPartido,
@@ -176,6 +176,28 @@ export const getEstadisticasJornada = async (req: AuthRequest, res: Response) =>
     res.json(stats)
   } catch {
     res.status(500).json({ error: 'Error al obtener estadísticas' })
+  }
+}
+
+export const getEstadisticasSinRegistrarJornada = async (req: AuthRequest, res: Response) => {
+  const jornadaId = req.params.jornadaId as string
+  try {
+    const stats = await db.select().from(estadisticaJornadaSinRegistrar)
+      .where(eq(estadisticaJornadaSinRegistrar.jornadaId, jornadaId))
+      .orderBy(asc(estadisticaJornadaSinRegistrar.nombreEquipoScraper), asc(estadisticaJornadaSinRegistrar.nombreCompletoScraper))
+    res.json(stats)
+  } catch {
+    res.status(500).json({ error: 'Error al obtener estadísticas sin registrar' })
+  }
+}
+
+export const borrarEstadisticaSinRegistrar = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string
+  try {
+    await db.delete(estadisticaJornadaSinRegistrar).where(eq(estadisticaJornadaSinRegistrar.id, id))
+    res.json({ mensaje: 'Descartada' })
+  } catch {
+    res.status(500).json({ error: 'Error al borrar' })
   }
 }
 
