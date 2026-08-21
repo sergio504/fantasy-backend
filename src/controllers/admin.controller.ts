@@ -11,6 +11,7 @@ import {
 } from '../db/schema'
 import { registrarAccion as registrar } from '../lib/registrarAccion'
 import { registrarCambioConfig } from '../lib/historial'
+import { normalizar, consonantes } from '../lib/importarEstadisticas'
 
 // ─── JUGADORES ─────────────────────────────────────
 
@@ -198,6 +199,52 @@ export const borrarEstadisticaSinRegistrar = async (req: AuthRequest, res: Respo
     res.json({ mensaje: 'Descartada' })
   } catch {
     res.status(500).json({ error: 'Error al borrar' })
+  }
+}
+
+// Reintenta casar un registro sin asignar contra el roster actual del equipo
+// (por si se acaba de crear el jugador o de añadir un alias), sin tener que
+// reimportar toda la jornada.
+export const reintentarEstadisticaSinRegistrar = async (req: AuthRequest, res: Response) => {
+  const id = req.params.id as string
+  try {
+    const [sr] = await db.select().from(estadisticaJornadaSinRegistrar).where(eq(estadisticaJornadaSinRegistrar.id, id)).limit(1)
+    if (!sr) { res.status(404).json({ error: 'No encontrado' }); return }
+    if (!sr.equipoId) { res.status(409).json({ error: 'Sin equipo asociado, no se puede reintentar' }); return }
+
+    const aliasRows = await db.select({ alias: aliasJugador.alias, nombreCompleto: jugador.nombreCompleto })
+      .from(aliasJugador).innerJoin(jugador, eq(aliasJugador.jugadorId, jugador.id))
+    const mapaAlias = new Map(aliasRows.map(r => [normalizar(r.alias), normalizar(r.nombreCompleto)]))
+    const nombreBuscado      = mapaAlias.get(normalizar(sr.nombreCompletoScraper)) ?? normalizar(sr.nombreCompletoScraper)
+    const consonantesBuscado = consonantes(nombreBuscado)
+
+    const jeRows = await db.select({ je: jugadorEquipo, jug: jugador })
+      .from(jugadorEquipo).innerJoin(jugador, eq(jugadorEquipo.jugadorId, jugador.id))
+      .where(and(eq(jugadorEquipo.equipoId, sr.equipoId), eq(jugadorEquipo.activo, true)))
+
+    const coincidencia =
+      jeRows.find(r => normalizar(r.jug.nombreCompleto) === nombreBuscado) ??
+      jeRows.find(r => consonantes(normalizar(r.jug.nombreCompleto)) === consonantesBuscado)
+
+    if (!coincidencia) {
+      res.status(404).json({ error: 'Sigue sin encontrarse. Comprueba el nombre, el alias o que el jugador exista.' })
+      return
+    }
+
+    await db.insert(estadisticaJornada).values({
+      id: randomUUID(), jornadaId: sr.jornadaId, jugadorEquipoId: coincidencia.je.id,
+      convocado: sr.convocado, titular: sr.titular, minutosJugados: sr.minutosJugados,
+      goles: sr.goles, golesDePenalti: sr.golesDePenalti, tarjetasAmarillas: sr.tarjetasAmarillas,
+      tarjetaRoja: sr.tarjetaRoja, resultado: sr.resultado, golesEncajados: sr.golesEncajados,
+      golesAFavor: sr.golesAFavor, golEnPropia: sr.golEnPropia, diferenciaGoles: sr.diferenciaGoles,
+      puntosCalculados: 0,
+    })
+    await db.delete(estadisticaJornadaSinRegistrar).where(eq(estadisticaJornadaSinRegistrar.id, id))
+
+    res.json({ mensaje: `Encontrado: ${coincidencia.jug.nombreCompleto}. Recalcula puntos de la jornada para que cuente.` })
+  } catch (e: any) {
+    if (e?.code === 'ER_DUP_ENTRY') { res.status(409).json({ error: 'Ya existía una estadística para ese jugador en esta jornada' }); return }
+    res.status(500).json({ error: e.message ?? 'Error al reintentar' })
   }
 }
 

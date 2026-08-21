@@ -10,11 +10,11 @@ import type { JornadaScraped, GolScraped } from './scraper'
 
 // ── Normalización ───────────────────────────────────────────────
 
-function normalizar(s: string): string {
+export function normalizar(s: string): string {
   return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim()
 }
 
-function consonantes(s: string): string {
+export function consonantes(s: string): string {
   return s.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[AEIOU\s]/g, '').replace(/[^A-Z]/g, '')
 }
 

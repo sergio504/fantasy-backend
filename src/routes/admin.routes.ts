@@ -6,7 +6,7 @@ import {
   crearFichaje, cerrarFichaje,
   getEquipos, getHistorial, getHistorialConfig,
   getEstadisticasJornada, editarEstadistica,
-  getEstadisticasSinRegistrarJornada, borrarEstadisticaSinRegistrar,
+  getEstadisticasSinRegistrarJornada, borrarEstadisticaSinRegistrar, reintentarEstadisticaSinRegistrar,
   getConfigPuntuacion, actualizarConfigPuntuacion,
   getConfigEconomia, actualizarConfigEconomia,
   getConfigRevalorizacion, actualizarConfigRevalorizacion,
@@ -39,8 +39,9 @@ router.patch('/usuarios/:id/toggle-activo',  toggleActivoUsuario)
 router.get('/estadisticas/:jornadaId',       getEstadisticasJornada)
 router.patch('/estadisticas/:id',            editarEstadistica)
 
-router.get('/estadisticas-sin-registrar/:jornadaId', getEstadisticasSinRegistrarJornada)
-router.delete('/estadisticas-sin-registrar/:id',      borrarEstadisticaSinRegistrar)
+router.get('/estadisticas-sin-registrar/:jornadaId',      getEstadisticasSinRegistrarJornada)
+router.delete('/estadisticas-sin-registrar/:id',           borrarEstadisticaSinRegistrar)
+router.post('/estadisticas-sin-registrar/:id/reintentar',  reintentarEstadisticaSinRegistrar)
 
 router.get('/config-puntuacion',             getConfigPuntuacion)
 router.patch('/config-puntuacion/:id',       actualizarConfigPuntuacion)
