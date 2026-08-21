@@ -276,6 +276,7 @@ export const configRevalorizacion = mysqlTable('configRevalorizacion', {
 export const conceptoSaldoValues = [
   'PRESUPUESTO_INICIAL', 'COMPRA_MERCADO', 'VENTA_MERCADO',
   'VENTA_RAPIDA', 'CLAUSULAZO_PAGO', 'CLAUSULAZO_COBRO', 'INVERSION_CLAUSULA',
+  'INGRESO_JORNADA',
 ] as const
 export type ConceptoSaldo = typeof conceptoSaldoValues[number]
 

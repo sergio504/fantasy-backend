@@ -9,7 +9,7 @@ import {
   Posicion, AccionPuntuacion, ResultadoPartido, MotivoPenalizacion,
 } from '../db/schema'
 import { registrarAccion } from './registrarAccion'
-import { registrarCambioValor, registrarCambioClausula } from './historial'
+import { registrarCambioValor, registrarCambioClausula, registrarMovimientoSaldo } from './historial'
 
 // ─── CÁLCULO DE PUNTOS ─────────────────────────────
 
@@ -294,6 +294,16 @@ export async function calcularPuntuacionesOp(jornadaId: string, adminId?: string
     const bonus   = bonusPosicion.get(miembroLigaId) ?? 0
     const ingreso = Math.round(eco.INGRESO_FIJO + (puntos * eco.INGRESO_POR_PUNTO) + bonus)
     await db.update(miembroLiga).set({ presupuestoRestante: sql`${miembroLiga.presupuestoRestante} + ${ingreso}` }).where(eq(miembroLiga.id, miembroLigaId))
+
+    const miembro = miembroMap.get(miembroLigaId)
+    if (miembro) {
+      await registrarMovimientoSaldo(db, {
+        miembroLigaId, ligaId: miembro.ligaId, concepto: 'INGRESO_JORNADA', importe: ingreso,
+        saldoResultante: miembro.presupuestoRestante + ingreso,
+        descripcion: `Ingreso jornada ${j.numJornada} (${puntos} pts${bonus ? ` + ${bonus} bono` : ''})`,
+        numJornada: j.numJornada,
+      })
+    }
     calculados++
   }
 
