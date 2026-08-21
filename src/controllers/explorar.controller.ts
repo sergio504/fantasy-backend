@@ -17,6 +17,7 @@ export const getRankings = async (req: Request, res: Response) => {
       .select({
         jugadorId: jugador.id,
         nombre: jugador.nombre,
+        nombreCompleto: jugador.nombreCompleto,
         posicion: jugador.posicion,
         valor: jugador.valor,
         equipoId: equipo.id,
@@ -28,7 +29,7 @@ export const getRankings = async (req: Request, res: Response) => {
       .innerJoin(jugador, eq(jugadorEquipo.jugadorId, jugador.id))
       .innerJoin(equipo, eq(jugadorEquipo.equipoId, equipo.id))
       .where(eq(equipo.division, division))
-      .groupBy(jugador.id, jugador.nombre, jugador.posicion, jugador.valor, equipo.id, equipo.nombre)
+      .groupBy(jugador.id, jugador.nombre, jugador.nombreCompleto, jugador.posicion, jugador.valor, equipo.id, equipo.nombre)
       .orderBy(desc(sum(estadisticaJornada.puntosCalculados)))
       .limit(5)
 
@@ -36,6 +37,7 @@ export const getRankings = async (req: Request, res: Response) => {
       .select({
         jugadorId: jugador.id,
         nombre: jugador.nombre,
+        nombreCompleto: jugador.nombreCompleto,
         posicion: jugador.posicion,
         valor: jugador.valor,
         equipoId: equipo.id,
