@@ -24,9 +24,10 @@ interface EntradaJSON {
 }
 
 const JSON_FILES = [
-  'jugadores_honor_bizkaia.json',
-  'jugadores_2rfef.json',
-  'jugadores_3rfef.json',
+  'jugadores_1rfef_grupo1.json',
+  'jugadores_2rfef_grupo1.json',
+  'jugadores_3rfef_grupo4_nuevo.json',
+  'jugadores_honor_bizkaia_nuevo.json',
 ]
 
 function uuid() {

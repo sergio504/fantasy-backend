@@ -5,7 +5,7 @@ import { relations } from 'drizzle-orm'
 
 // ─── ENUMS ─────────────────────────────────────────
 
-export const divisionValues    = ['RFEF2_GRUPO_II', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA'] as const
+export const divisionValues    = ['RFEF1_GRUPO_I', 'RFEF2_GRUPO_I', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA'] as const
 
 export const divisiones = mysqlTable('divisiones', {
   id:              varchar('id', { length: 36 }).primaryKey(),

@@ -4,7 +4,7 @@ import { db } from '../db'
 import { jugador, jugadorEquipo, equipo, estadisticaJornada, miembroLiga, liga, usuario, aliasEquipo } from '../db/schema'
 import type { Division } from '../db/schema'
 
-const DIVISIONES_VALIDAS = ['RFEF2_GRUPO_II', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA']
+const DIVISIONES_VALIDAS = ['RFEF1_GRUPO_I', 'RFEF2_GRUPO_I', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA']
 
 export const getRankings = async (req: Request, res: Response) => {
   const division = req.query.division as Division

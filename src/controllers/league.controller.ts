@@ -67,7 +67,7 @@ export const crearLiga = async (req: AuthRequest, res: Response) => {
   const creadorId = req.usuarioId!
 
   if (!nombre || !division) { res.status(400).json({ error: 'nombre y division son obligatorios' }); return }
-  const divisiones: Division[] = ['RFEF2_GRUPO_II', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA']
+  const divisiones: Division[] = ['RFEF1_GRUPO_I', 'RFEF2_GRUPO_I', 'RFEF3_GRUPO_IV', 'HONOR_BIZKAIA']
   if (!divisiones.includes(division)) {
     res.status(400).json({ error: `division debe ser uno de: ${divisiones.join(', ')}` }); return
   }
