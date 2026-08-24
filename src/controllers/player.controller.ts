@@ -92,7 +92,7 @@ export const getEstadisticasJugador = async (req: Request, res: Response) => {
     const jornadasJugadas = await db
       .select({ id: jornada.id, numJornada: jornada.numJornada, division: jornada.division, fechaInicioJornada: jornada.fechaInicioJornada, fechaFinJornada: jornada.fechaFinJornada })
       .from(jornada)
-      .where(and(eq(jornada.division, equipoInfo.division), eq(jornada.statsImportadas, true)))
+      .where(and(eq(jornada.division, equipoInfo.division), eq(jornada.puntosPorJugadorCalculados, true)))
       .orderBy(asc(jornada.numJornada))
 
     const statsPorJornadaId = new Map(conPropietario.map(e => [e.jornadaId, e]))
