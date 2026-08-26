@@ -20,7 +20,8 @@
     "reparar:valores": "ts-node -P tsconfig.scripts.json prisma/reparar-corrupcion-valores.ts",
     "backfill:saldo": "ts-node -P tsconfig.scripts.json prisma/backfill-historial-saldo.ts",
     "reset:total": "ts-node -P tsconfig.scripts.json prisma/borrar-todo-menos-diccionarios.ts",
-    "reset:temporada": "ts-node -P tsconfig.scripts.json prisma/borrar-menos-jugadores-config-admin.ts"
+    "reset:temporada": "ts-node -P tsconfig.scripts.json prisma/borrar-menos-jugadores-config-admin.ts",
+    "borrar:ligas": "ts-node -P tsconfig.scripts.json prisma/borrar-liga.ts"
   },
   "keywords": [],
   "author": "",
