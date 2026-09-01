@@ -18,6 +18,43 @@ export function consonantes(s: string): string {
   return s.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[AEIOU\s]/g, '').replace(/[^A-Z]/g, '')
 }
 
+// Siglas habituales en nombres de clubes españoles que en la web de origen
+// aparecen abreviadas ("C.D.", "U.D."...) pero en la BD están desarrolladas
+// ("Club Deportivo", "Unión Deportiva"...). Se expanden antes de comparar
+// palabra a palabra para que no cuenten como "no coincide".
+const ABREVIATURAS_EQUIPO: Record<string, string[]> = {
+  cd:  ['club', 'deportivo'],
+  ud:  ['union', 'deportiva'],
+  sd:  ['sociedad', 'deportiva'],
+  ad:  ['asociacion', 'deportiva'],
+  cf:  ['club', 'futbol'],
+  cp:  ['club', 'polideportivo'],
+  ca:  ['club', 'atletico'],
+  sad: [],
+  sa:  [],
+}
+
+// Palabras genéricas de forma jurídica/tipo de club: no identifican al
+// equipo (aparecen en decenas de nombres), así que no cuentan como
+// coincidencia por sí solas — solo las palabras "distintivas" (el topónimo)
+// sirven para decidir si dos nombres son el mismo equipo.
+const PALABRAS_GENERICAS_EQUIPO = new Set([
+  'real', 'club', 'deportivo', 'deportiva', 'union', 'sociedad', 'futbol',
+  'atletico', 'polideportivo', 'asociacion', 'balompie', 'sad', 'sa', 'ca',
+])
+
+function palabrasEquipo(nombreNormalizado: string): string[] {
+  return nombreNormalizado
+    .replace(/\./g, '')
+    .split(' ')
+    .flatMap(p => ABREVIATURAS_EQUIPO[p] ?? [p])
+    .filter(p => p.length > 2)
+}
+
+function palabrasDistintivasEquipo(nombreNormalizado: string): string[] {
+  return palabrasEquipo(nombreNormalizado).filter(p => !PALABRAS_GENERICAS_EQUIPO.has(p))
+}
+
 function calcularResultado(favor: number, contra: number): ResultadoPartido {
   if (favor > contra) return 'VICTORIA'
   if (favor < contra) return 'DERROTA'
@@ -66,12 +103,14 @@ export async function importarEstadisticas(
 
       // Buscar equipo en BD
       const nombreNorm = resolverEquipo(equipoJSON.equipo)
+      const distintivasScraped = palabrasDistintivasEquipo(nombreNorm)
       const equipoBD =
         todosEquipos.find(e => normalizar(e.nombre) === nombreNorm) ??
         todosEquipos.find(e => { const n = normalizar(e.nombre); return n.includes(nombreNorm) || nombreNorm.includes(n) }) ??
         todosEquipos.find(e => {
-          const palabrasBD = new Set(normalizar(e.nombre).split(' ').filter(p => p.length > 2))
-          return nombreNorm.split(' ').filter(p => p.length > 2).filter(p => palabrasBD.has(p)).length >= 2
+          if (distintivasScraped.length === 0) return false
+          const distintivasBD = new Set(palabrasDistintivasEquipo(normalizar(e.nombre)))
+          return distintivasScraped.every(p => distintivasBD.has(p))
         })
 
       if (!equipoBD) {
@@ -137,7 +176,7 @@ export async function importarEstadisticas(
           })
           totalOk++
         } catch (e: any) {
-          if (e?.code !== 'ER_DUP_ENTRY') throw e
+          if ((e?.code ?? e?.cause?.code) !== 'ER_DUP_ENTRY') throw e
         }
       }
     }

@@ -186,7 +186,7 @@ export async function generarSnapshotOp(jornadaId: string, adminId?: string): Pr
   return `Snapshot generado: ${snapshots.length} entradas${penalizaciones.length ? ` · Penalizados (-10 pts): ${detalles}` : ''}`
 }
 
-export async function calcularPuntosPorJugadorOp(jornadaId: string, adminId?: string): Promise<string> {
+export async function calcularPuntosPorJugadorOp(jornadaId: string, adminId?: string, soloEstadisticaIds?: string[]): Promise<string> {
   const [j] = await db.select().from(jornada).where(eq(jornada.id, jornadaId)).limit(1)
   if (!j) throw new Error('Jornada no encontrada')
 
@@ -205,7 +205,11 @@ export async function calcularPuntosPorJugadorOp(jornadaId: string, adminId?: st
     .from(estadisticaJornada)
     .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, estadisticaJornada.jugadorEquipoId))
     .innerJoin(jugador,       eq(jugador.id, jugadorEquipo.jugadorId))
-    .where(eq(estadisticaJornada.jornadaId, jornadaId))
+    .where(
+      soloEstadisticaIds
+        ? and(eq(estadisticaJornada.jornadaId, jornadaId), inArray(estadisticaJornada.id, soloEstadisticaIds))
+        : eq(estadisticaJornada.jornadaId, jornadaId)
+    )
 
   let actualizados = 0
   const jugadoresActualizados = new Set<string>()
