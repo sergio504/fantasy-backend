@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 
-URL = "https://www.lapreferente.com/C22283-19/tercera-federacion-grupo-4/calendario.html"
+URL = "https://www.lapreferente.com/C26708-8/primera-federacion-grupo-1/calendario.html"
 
 # Extraer nombre de competición del segundo segmento de la URL
 _partes_url = urlparse(URL).path.strip("/").split("/")
@@ -313,6 +313,23 @@ def calcular_goles_jugadores(equipos, goles_equipos):
             )
 
 
+async def corregir_codificacion(route):
+    """
+    lapreferente.com sirve el HTML en windows-1252 pero Chromium lo intenta
+    interpretar como UTF-8, corrompiendo tildes/ñ (aparecen como U+FFFD).
+    Se intercepta la respuesta, se redecodifica como windows-1252 y se
+    reenvía como UTF-8 con el header correcto.
+    """
+    if route.request.resource_type != "document":
+        await route.continue_()
+        return
+    response = await route.fetch()
+    body = await response.body()
+    texto = body.decode("windows-1252", errors="replace")
+    headers = {**response.headers, "content-type": "text/html; charset=utf-8"}
+    await route.fulfill(response=response, body=texto, headers=headers)
+
+
 async def procesar_partido(page, url, idx):
     print(f"\n{'='*60}")
     print(f"[Partido {idx}] Cargando {url}")
@@ -368,6 +385,7 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
+        await page.route("**/*", corregir_codificacion)
 
         print(f"[1] Conectando a {URL} ...")
         await page.goto(URL, wait_until="domcontentloaded", timeout=60_000)
