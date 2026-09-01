@@ -256,7 +256,9 @@ export const estadisticaJornadaSinRegistrar = mysqlTable('estadisticaJornadaSinR
   golEnPropia:           int('golEnPropia').notNull().default(0),
   diferenciaGoles:       int('diferenciaGoles').notNull().default(0),
   creadoEn:              datetime('creadoEn').notNull(),
-})
+}, t => ({
+  jornadaEquipoJugadorUniq: uniqueIndex('ejsr_jornada_equipo_jugador').on(t.jornadaId, t.equipoId, t.nombreCompletoScraper),
+}))
 
 export const configEconomia = mysqlTable('configEconomia', {
   id:          varchar('id', { length: 36 }).primaryKey(),
