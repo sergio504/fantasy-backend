@@ -200,15 +200,21 @@ export async function calcularPuntosPorJugadorOp(jornadaId: string, adminId?: st
 
   const tramosReval = await cargarConfigRevalorizacion()
 
+  // Solo se procesan filas sin `desglose` todavía (nunca calculadas). Esto
+  // hace la función idempotente: se puede volver a llamar tras añadir
+  // estadísticas nuevas (p.ej. tras "Reintentar" en el panel de admin) sin
+  // volver a aplicar la revalorización de valor a jugadores ya procesados.
   const rows = await db
     .select({ est: estadisticaJornada, posicion: jugador.posicion, jugadorId: jugador.id, valorActual: jugador.valor })
     .from(estadisticaJornada)
     .innerJoin(jugadorEquipo, eq(jugadorEquipo.id, estadisticaJornada.jugadorEquipoId))
     .innerJoin(jugador,       eq(jugador.id, jugadorEquipo.jugadorId))
     .where(
-      soloEstadisticaIds
-        ? and(eq(estadisticaJornada.jornadaId, jornadaId), inArray(estadisticaJornada.id, soloEstadisticaIds))
-        : eq(estadisticaJornada.jornadaId, jornadaId)
+      and(
+        eq(estadisticaJornada.jornadaId, jornadaId),
+        isNull(estadisticaJornada.desglose),
+        soloEstadisticaIds ? inArray(estadisticaJornada.id, soloEstadisticaIds) : undefined,
+      )
     )
 
   let actualizados = 0
